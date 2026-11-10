@@ -87,7 +87,7 @@
     </form>
     <button class="povezava" id="b-preklopi">Nimate računa? Registracija</button>
     <button class="povezava" id="b-pozabljeno">Pozabljeno geslo</button>
-    <div class="noga">Podatki so shranjeni v EU. Zgodovina uporabe luči se ne hrani.</div>
+    <div class="noga">Podatki so shranjeni v EU. Zgodovina uporabe luči se ne hrani.<br><a href="zasebnost.html" style="color:inherit">Politika zasebnosti</a></div>
   </section>
 
   <!-- NOVO GESLO (po povezavi iz e-pošte) -->
@@ -160,7 +160,7 @@
         </div>
       </div>
     </div>
-    <div class="noga">Stajl Home · Mizarstvo Stajl</div>
+    <div class="noga">Stajl Home · Mizarstvo Stajl · <a href="zasebnost.html" style="color:inherit">Politika zasebnosti</a></div>
   </section>
 
 </div>
@@ -518,6 +518,7 @@
       }
     }, 0);
   });
+  if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (_) {} }
 })();
 </script>
 </body>

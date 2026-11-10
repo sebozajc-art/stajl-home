@@ -18,5 +18,13 @@
    "type": "image/png",
    "purpose": "any maskable"
   }
+ ],
+ "id": "./",
+ "description": "Krmiljenje vgrajene LED razsvetljave v pohištvu Mizarstva Stajl.",
+ "lang": "sl",
+ "orientation": "portrait",
+ "categories": [
+  "utilities",
+  "lifestyle"
  ]
 }
