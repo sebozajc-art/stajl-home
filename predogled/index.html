@@ -163,7 +163,17 @@
   .moznost .ik svg { width:28px; height:28px; } .moznost b { display:block; font-weight:500; font-size:15px; } .moznost small { display:block; color:var(--siva); font-size:12px; margin-top:3px; }
   .kamera { position:fixed; inset:0; z-index:60; background:#000; }
   .kamera video { width:100%; height:100%; object-fit:cover; }
-  .kamera .okvir { position:absolute; left:50%; top:45%; width:64vmin; height:64vmin; transform:translate(-50%,-50%); border:1.5px solid rgba(255,255,255,.9); border-radius:18px; box-shadow:0 0 0 100vmax rgba(0,0,0,.45); }
+  .kamera { opacity:0; transition:opacity .35s ease; } .kamera.vidno { opacity:1; }
+  .kamera .okvir { position:absolute; left:50%; top:45%; width:62vmin; height:62vmin; transform:translate(-50%,-50%); border-radius:22px; box-shadow:0 0 0 100vmax rgba(12,11,10,.55); overflow:hidden; }
+  .kamera .okvir i { position:absolute; width:28px; height:28px; border:2px solid #fff; }
+  .kamera .okvir i:nth-child(1) { top:0; left:0; border-right:0; border-bottom:0; border-top-left-radius:22px; }
+  .kamera .okvir i:nth-child(2) { top:0; right:0; border-left:0; border-bottom:0; border-top-right-radius:22px; }
+  .kamera .okvir i:nth-child(3) { bottom:0; left:0; border-right:0; border-top:0; border-bottom-left-radius:22px; }
+  .kamera .okvir i:nth-child(4) { bottom:0; right:0; border-left:0; border-top:0; border-bottom-right-radius:22px; }
+  .kamera .okvir::after { content:''; position:absolute; left:12%; right:12%; height:1px; background:linear-gradient(90deg,transparent,rgba(214,176,128,.95),transparent); animation:sken 2.4s ease-in-out infinite; }
+  @keyframes sken { 0%,100% { top:14%; } 50% { top:86%; } }
+  .kamera .okvir.najdeno i { border-color:#d6b080; }
+  .kamera-vrh { position:absolute; top:calc(22px + env(safe-area-inset-top)); left:0; right:0; text-align:center; color:#fff; font-size:11px; letter-spacing:.3em; text-transform:uppercase; opacity:.85; }
   .kamera-besedilo { position:absolute; left:0; right:0; top:calc(45% + 36vmin); text-align:center; color:#fff; font-size:14px; letter-spacing:.04em; padding:0 24px; }
   .kamera-sporocilo { position:absolute; left:0; right:0; top:calc(45% + 36vmin + 30px); text-align:center; color:#f3c9b9; font-size:13px; padding:0 24px; }
   .kamera-zapri { position:absolute; left:50%; bottom:calc(36px + env(safe-area-inset-bottom)); transform:translateX(-50%); background:rgba(255,255,255,.92); color:#222; border:0; border-radius:999px; padding:13px 34px; font:inherit; font-size:13px; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; }
@@ -204,7 +214,8 @@
 </div>
 <div class="kamera skrito" id="kamera">
   <video id="kamera-video" playsinline muted></video>
-  <div class="okvir"></div>
+  <div class="kamera-vrh">Stajl Home</div>
+  <div class="okvir"><i></i><i></i><i></i><i></i></div>
   <div class="kamera-besedilo" data-t="usmeriKamero"></div>
   <div class="kamera-sporocilo" id="kamera-sporocilo"></div>
   <button class="kamera-zapri" id="b-kamera-zapri" data-t="preklici"></button>
@@ -744,17 +755,20 @@
   function ustaviKamero() {
     skeniram = false;
     if (tok) { tok.getTracks().forEach(x => x.stop()); tok = null; }
-    $('kamera').classList.add('skrito');
+    $('kamera').classList.remove('vidno'); $('kamera').classList.add('skrito');
   }
   $('b-kamera-zapri').onclick = ustaviKamero;
   $('b-skeniraj').onclick = async () => {
-    zapriList();
     $('kamera-sporocilo').textContent = '';
-    $('kamera').classList.remove('skrito');
+    $('kamera').querySelector('.okvir').classList.remove('najdeno');
     try {
-      tok = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-    } catch (_) { ustaviKamero(); odpriList(); $('b-rocno').onclick(); return sporoci('list-sporocilo', t('eKamera'), true); }
+      // najprej telefon sam vpraša za dovoljenje za kamero, šele nato pokažemo skener
+      tok = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false });
+    } catch (_) { $('b-rocno').onclick(); return sporoci('list-sporocilo', t('eKamera'), true); }
+    zapriList();
     const v = $('kamera-video'); v.srcObject = tok; await v.play().catch(() => {});
+    $('kamera').classList.remove('skrito');
+    requestAnimationFrame(() => $('kamera').classList.add('vidno'));
     let detektor = null;
     if ('BarcodeDetector' in window) { try { detektor = new BarcodeDetector({ formats: ['qr_code'] }); } catch (_) {} }
     if (!detektor) { try { await naloziJsQR(); } catch (_) {} }
@@ -775,7 +789,7 @@
       } catch (_) {}
       if (besedilo) {
         const k = kodaIzQR(besedilo);
-        if (k) { if (navigator.vibrate) navigator.vibrate(40); ustaviKamero(); await obdelajKodo(k); return; }
+        if (k) { skeniram = false; $('kamera').querySelector('.okvir').classList.add('najdeno'); if (navigator.vibrate) navigator.vibrate(40); await new Promise(r => setTimeout(r, 450)); ustaviKamero(); await obdelajKodo(k); return; }
         $('kamera-sporocilo').textContent = t('eQR');
       }
       setTimeout(korak, 180);
