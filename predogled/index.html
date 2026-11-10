@@ -160,13 +160,18 @@
   .prostor-naslov { margin:0; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .p.prostor { min-height:118px; }
   .oznaka-vrsta { display:flex; justify-content:space-between; align-items:baseline; }
-  .oznaka-vrsta .povezava { font-size:12px; padding:0; }
+  .oznaka-vrsta .povezava { font-size:12px; padding:0; flex:none; }
+  .oznaka-vrsta .oznaka { flex:1; }
   .scene-vrsta { display:flex; gap:8px; overflow-x:auto; padding:2px 0 8px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
   .scene-vrsta::-webkit-scrollbar { display:none; }
-  .scena-cip { flex:none; font:inherit; font-size:13px; letter-spacing:.02em; padding:12px 18px; border-radius:999px; border:1px solid var(--crta); background:var(--plosca); color:var(--tekst); cursor:pointer; transition:background .2s, color .2s; }
-  .scena-cip.dodaj { background:transparent; border-style:dashed; color:var(--siva); }
-  .scena-cip.uredi::after { content:'  ›'; color:var(--les); }
-  .scena-cip.blisk { background:var(--aktivno); color:#f4f3f1; border-color:var(--aktivno); }
+  .scena-cip { flex:none; width:96px; height:96px; display:flex; flex-direction:column; justify-content:space-between; align-items:flex-start; text-align:left;
+                font:inherit; font-size:13px; padding:12px; border-radius:10px; border:0; background:var(--plosca); color:var(--tekst); cursor:pointer; transition:background .25s, color .25s; }
+  .scena-cip .ik svg { width:26px; height:26px; display:block; }
+  .scena-cip .im { line-height:1.2; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; width:100%; }
+  .scena-cip.dodaj { background:transparent; border:1px dashed var(--crta); color:var(--siva); }
+  .scena-cip.uredi { outline:1px solid var(--les); outline-offset:-1px; }
+  .scena-cip.blisk { background:var(--aktivno); color:#f4f3f1; }
+  .scene-vrsta { gap:6px !important; }
   .spodnje-povezave { display:flex; justify-content:space-between; margin-top:22px; }
   .spodnje-povezave .povezava { font-size:12px; }
   .vrsta-vnos { display:flex; gap:12px; align-items:flex-end; }
@@ -473,6 +478,8 @@
     <div class="sporocilo" id="scena-sporocilo"></div>
     <label for="scena-ime" data-t="scenaIme"></label>
     <input id="scena-ime" maxlength="30">
+    <label data-t="ikona"></label>
+    <div id="scena-ikone"></div>
     <div class="cipi" id="scena-predlogi"></div>
     <div class="oznaka" data-t="luci"></div>
     <div id="scena-luci"></div>
@@ -694,6 +701,21 @@
     l_strop: '<path d="M3 3h18M12 3v4"/><path d="M7 12a5 5 0 0 1 10 0z"/><path d="M8 15l-1 2M12 15v2.5M16 15l1 2"/>',
     l_trak: '<rect x="2" y="10" width="20" height="4" rx="1"/><path d="M5.5 12h.5M9.5 12h.5M13.5 12h.5M17.5 12h.5"/><path d="M5 7.5l-.5-1.5M12 7V5M19 7.5l.5-1.5M5 16.5l-.5 1.5M12 17v2M19 16.5l.5 1.5"/>'
   };
+  Object.assign(IKONE, {
+    s_jutro: '<path d="M3 18h18M6 18a6 6 0 0 1 12 0M12 4v5M9.5 6.5L12 4l2.5 2.5M4.5 12.5l1.2.7M19.5 12.5l-1.2.7M3 21h18"/>',
+    s_festa: '<path d="M4 20l5-14 9 9z"/><path d="M7 14l3 3M14 5l1-1.5M18 8l2-.5M17 3.5l.5.5M19.5 5.5h.5"/>',
+    s_branje: '<path d="M12 6c-2-1.5-5-2-8-1.5v14c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-14c-3-.5-6 0-8 1.5zM12 6v14"/>',
+    s_sveca: '<path d="M9 10h6v11H9zM12 10V8.5"/><path d="M12 3c1 1.5 1.5 2.3 1.5 3a1.5 1.5 0 0 1-3 0c0-.7.5-1.5 1.5-3z"/>',
+    s_odhod: '<path d="M14 3H6v18h8"/><path d="M11 12h10M18 9l3 3-3 3"/>'
+  });
+  const IKONE_SCEN = ['vecer', 'noc', 's_jutro', 'kuhanje', 'l_tv', 'r_jedilnica', 's_festa', 's_branje', 's_sveca', 's_odhod', 'luc', 'r_dnevna'];
+  function ikonaSceno(ime) {
+    const p = [[/večer|vecer|evening/i, 'vecer'], [/noč|noc|night|spanje|sleep/i, 'noc'], [/jutr|zajtrk|morning|breakfast/i, 's_jutro'], [/kuh|cook/i, 'kuhanje'],
+      [/film|tv|movie/i, 'l_tv'], [/večerj|vecerj|kosil|dinner|lunch|gost|guest/i, 'r_jedilnica'], [/fešt|fest|zabav|party/i, 's_festa'], [/bran|knjig|read/i, 's_branje'],
+      [/roman|sprost|relax|sveč|svec/i, 's_sveca'], [/odhod|odsot|away|leave/i, 's_odhod']];
+    const z = p.find(([re]) => re.test(ime || ''));
+    return z ? z[1] : 'luc';
+  }
   const IKONE_PROSTOROV = ['kuhanje', 'r_dnevna', 'r_spalnica', 'r_otroska', 'r_kopalnica', 'r_jedilnica', 'r_hodnik', 'r_garderoba', 'r_pisarna', 'r_terasa', 'r_stopnice', 'r_klet', 'r_garaza', 'r_delavnica', 'r_pralnica', 'r_dom'];
   const KATEGORIJE_LUCI = [
     ['katKuhinja', ['pult', 'omare', 'vitrina', 'spodaj', 'l_otok', 'l_napa', 'l_predal', 'notranjost']],
@@ -994,7 +1016,7 @@
       sb.from('devices').select(IZBRANO),
       sb.from('prostori').select('id,dom_id,ime,ikona').eq('dom_id', trenutniDom).order('created_at'),
       sb.from('luci_prostorov').select('device_id,channel,prostor_id,ikona'),
-      sb.from('scene_doma').select('id,ime,nastavi').eq('dom_id', trenutniDom).order('created_at')
+      sb.from('scene_doma').select('id,ime,nastavi,ikona').eq('dom_id', trenutniDom).order('created_at')
     ]);
     if (nd.error) throw nd.error;
     if (pr.error) throw pr.error;
@@ -1062,18 +1084,19 @@
     $('vrsta-scene').classList.toggle('skrito', !vse.length);
     $('b-uredi-scene').textContent = urejamScene ? t('koncano') : t('uredi');
     $('b-uredi-scene').classList.toggle('skrito', !sceneDoma.length);
-    const cip = (ime, fn, cls) => {
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'scena-cip' + (cls ? ' ' + cls : ''); b.textContent = ime;
+    const cip = (ime, ikona, fn, cls) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'scena-cip' + (cls ? ' ' + cls : '');
+      b.innerHTML = `<span class="ik">${svg(ikona)}</span><span class="im"></span>`; b.querySelector('.im').textContent = ime;
       b.onclick = fn; sc.appendChild(b); return b;
     };
-    if (!urejamScene) cip(t('vseUgasni'), (e) => { blisk(e.currentTarget); poslji(luciDoma().map(r => ({ dev: r.device_id, ch: r.channel, on: false }))); });
+    if (!urejamScene) cip(t('vseUgasni'), 'ugasni', (e) => { blisk(e.currentTarget); poslji(luciDoma().map(r => ({ dev: r.device_id, ch: r.channel, on: false }))); });
     sceneDoma.forEach(s => {
-      const b = cip(s.ime, (e) => { if (urejamScene) return odpriSceno(s); blisk(e.currentTarget); uporabiSceno(s); }, urejamScene ? 'uredi' : '');
+      const b = cip(s.ime, s.ikona || ikonaSceno(s.ime), (e) => { if (urejamScene) return odpriSceno(s); blisk(e.currentTarget); uporabiSceno(s); }, urejamScene ? 'uredi' : '');
       let dolgo = null;
       b.addEventListener('pointerdown', () => { dolgo = setTimeout(() => { dolgo = 'odprto'; odpriSceno(s); }, 600); });
       ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => { if (dolgo !== 'odprto') clearTimeout(dolgo); }));
     });
-    cip('+ ' + t('scena'), () => odpriSceno(null), 'dodaj');
+    cip(t('scena'), 'plus', () => odpriSceno(null), 'dodaj');
   }
   $('b-uredi-scene').onclick = () => { urejamScene = !urejamScene; narisiScene(); };
 
@@ -1470,7 +1493,8 @@
   $('b-nazaj3').onclick = () => { if (poPrevzemu) naloziDomove(); else odpriNastavitve(); };
 
   // ---------- lastne scene doma ----------
-  let urejanaScena = null, scenaNast = {};
+  let urejanaScena = null, scenaNast = {}, ikonaScene = 'luc', ikonaSceneRocno = false;
+  $('scena-ime').oninput = () => { if (ikonaSceneRocno) return; ikonaScene = ikonaSceno($('scena-ime').value); oznaciIkono($('scena-ikone'), ikonaScene); };
   function odpriSceno(s) {
     urejanaScena = s;
     scenaNast = {};
@@ -1481,6 +1505,8 @@
     pokazi('v-scena');
     $('scena-naslov').textContent = s ? t('urediSceno') : t('novaScena');
     $('scena-ime').value = s ? s.ime : '';
+    ikonaScene = s ? (s.ikona || ikonaSceno(s.ime)) : 'luc'; ikonaSceneRocno = !!s;
+    izbiraIkon($('scena-ikone'), [[null, IKONE_SCEN]], ikonaScene, k => { ikonaScene = k; ikonaSceneRocno = true; });
     $('b-scena-izbrisi').classList.toggle('skrito', !s);
     sporoci('scena-sporocilo', '');
     const el = $('scena-luci'); el.innerHTML = '';
@@ -1514,8 +1540,8 @@
     if (!Object.keys(scenaNast).length) return sporoci('scena-sporocilo', t('eScenaLuc'), true);
     const nastavi = polnaScena();
     const { error } = urejanaScena
-      ? await sb.from('scene_doma').update({ ime, nastavi }).eq('id', urejanaScena.id)
-      : await sb.from('scene_doma').insert({ dom_id: trenutniDom, ime, nastavi });
+      ? await sb.from('scene_doma').update({ ime, nastavi, ikona: ikonaScene }).eq('id', urejanaScena.id)
+      : await sb.from('scene_doma').insert({ dom_id: trenutniDom, ime, nastavi, ikona: ikonaScene });
     if (error) return sporoci('scena-sporocilo', prevedi(error), true);
     urejamScene = false;
     naloziDomove();
