@@ -149,7 +149,7 @@
     <div id="seznam-domov"></div>
     <button class="sek" id="b-demo" style="width:100%; margin-top:10px">Preizkusi Demo kuhinjo</button>
     <div class="razdelek">
-      <div class="naslov">Dodaj kuhinjo ali prostor</div>
+      <div class="naslov">Dodaj luč ali kuhinjo</div>
       <div class="sporocilo" id="dodaj-sporocilo"></div>
       <form id="f-dodaj" novalidate>
         <label for="koda">Koda z nalepke Stajl Home (ali skenirajte QR kodo s kamero telefona)</label>
@@ -171,6 +171,20 @@
     <div class="mreza" id="scene"></div>
     <button class="povezava" id="b-uredi">Uredi imena luči</button>
     <div class="noga">Mizarstvo Stajl</div>
+  </section>
+
+  <!-- NOVA LUČ (po skeniranju QR kode luči) -->
+  <section id="v-novaluc" class="skrito">
+    <div class="vrh"><button class="nazaj" id="b-nazaj-luc" aria-label="Nazaj">←</button><span>Stajl Home</span></div>
+    <h1 style="margin-bottom:2px">Nova luč</h1>
+    <div style="color:var(--siva); font-size:14px; margin-bottom:16px">Vpišite ime, ki je napisano na nalepki ob QR kodi.</div>
+    <div class="sporocilo" id="novaluc-sporocilo"></div>
+    <form id="f-novaluc" novalidate>
+      <label for="ime-luci">Ime luči</label>
+      <input id="ime-luci" maxlength="30" autocomplete="off" placeholder="npr. Vitrina">
+      <div class="cipi" id="cipi-luc"></div>
+      <button class="gl" type="submit" style="border-radius:999px; letter-spacing:.06em">Dodaj luč</button>
+    </form>
   </section>
 
   <!-- UREDI IMENA IZHODOV -->
@@ -246,7 +260,7 @@
 
   // ---------- pomožno ----------
   function pokazi(v) {
-    ['v-dobro', 'v-prijava', 'v-novogeslo', 'v-domovi', 'v-naprava', 'v-uredi', 'v-nastavitve'].forEach(x => $(x).classList.toggle('skrito', x !== v));
+    ['v-dobro', 'v-prijava', 'v-novogeslo', 'v-domovi', 'v-naprava', 'v-novaluc', 'v-uredi', 'v-nastavitve'].forEach(x => $(x).classList.toggle('skrito', x !== v));
     if (v !== 'v-naprava' && v !== 'v-uredi') { clearInterval(osvezevanje); osvezevanje = null; }
     window.scrollTo(0, 0);
   }
@@ -265,6 +279,7 @@
     if (/rate limit/i.test(m)) return 'Preveč poskusov. Poskusite čez nekaj minut.';
     if (/Koda ne obstaja/.test(m)) return 'Te kode ne poznamo. Preverite nalepko.';
     if (/že prevzeta/.test(m)) return 'Ta naprava že ima lastnika. Za dostop naj vas lastnik povabi.';
+    if (/Vpišite ime/.test(m)) return 'Vpišite ime luči.';
     if (/Samo lastnik/.test(m)) return 'To lahko spremeni samo lastnik kuhinje.';
     if (/fetch|network/i.test(m)) return 'Ni povezave z internetom.';
     return m;
@@ -367,11 +382,43 @@
     const r = await sb.from('devices').select('id,name,channels,state,last_seen,demo').eq('id', data).maybeSingle();
     if (r.data) odpriNapravo(r.data); else naloziDomove();
   };
+  let kodaLuci = null;
+  async function obdelajKodo(k) {
+    const { data: vrsta, error } = await sb.rpc('vrsta_kode', { p_koda: k });
+    if (error) { pokazi('v-domovi'); sporoci('dodaj-sporocilo', prevedi(error), true); return false; }
+    if (vrsta === 'luc') { odpriNovoLuc(k); return true; }
+    if (vrsta === 'naprava') return !!(await prevzemi(k));
+    pokazi('v-domovi'); sporoci('dodaj-sporocilo', 'Te kode ne poznamo. Preverite nalepko.', true); return false;
+  }
+  function odpriNovoLuc(k) {
+    kodaLuci = k;
+    pokazi('v-novaluc');
+    sporoci('novaluc-sporocilo', '');
+    $('ime-luci').value = '';
+    const c = $('cipi-luc'); c.innerHTML = '';
+    PREDLOGI.forEach(p => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'cip'; b.textContent = p;
+      b.onclick = () => { $('ime-luci').value = p; c.querySelectorAll('.cip').forEach(x => x.classList.toggle('izbran', x === b)); };
+      c.appendChild(b);
+    });
+    setTimeout(() => $('ime-luci').focus(), 50);
+  }
+  $('f-novaluc').onsubmit = async (e) => {
+    e.preventDefault();
+    const ime = $('ime-luci').value.trim();
+    if (!ime) return sporoci('novaluc-sporocilo', 'Vpišite ime luči, npr. »Vitrina«.', true);
+    const { data, error } = await sb.rpc('dodaj_luc', { p_koda: kodaLuci, p_ime: ime });
+    if (error) return sporoci('novaluc-sporocilo', prevedi(error), true);
+    const r = await sb.from('devices').select('id,name,channels,state,last_seen,demo').eq('id', data.device_id).maybeSingle();
+    if (r.data) odpriNapravo(r.data); else naloziDomove('Luč je dodana.');
+  };
+  $('b-nazaj-luc').onclick = () => naloziDomove();
   $('f-dodaj').onsubmit = async (e) => {
     e.preventDefault();
     const k = $('koda').value.trim().toUpperCase();
     if (!/^[A-Z0-9]{6,12}$/.test(k)) return sporoci('dodaj-sporocilo', 'Vpišite kodo z nalepke (črke in številke).', true);
-    if (await prevzemi(k)) $('koda').value = '';
+    if (await obdelajKodo(k)) $('koda').value = '';
   };
 
   // ---------- naprava ----------
@@ -398,7 +445,7 @@
       const zdaj = imaImena(d) ? (d.channels[i] || '') : '';
       const v = document.createElement('div');
       v.className = 'izhod';
-      v.innerHTML = `<div class="gl-vrsta"><span class="oznaka">Izhod ${i + 1} (O${i + 1})</span><button class="mali" type="button">Pokaži</button></div>
+      v.innerHTML = `<div class="gl-vrsta"><span class="oznaka">Luč ${i + 1}</span><button class="mali" type="button">Pokaži</button></div>
         <input maxlength="30" placeholder="ni priklopljeno" aria-label="Ime izhoda ${i + 1}">
         <div class="cipi"></div>`;
       const inp = v.querySelector('input'); inp.value = zdaj;
@@ -559,13 +606,13 @@
       if (dogodek === 'PASSWORD_RECOVERY' || (obnovaGesla && seja)) { obnovaGesla = false; pokazi('v-novogeslo'); return; }
       if (!uporabnik) {
         nastaviNacin(false); pokazi('v-dobro');
-        sporoci('dobro-sporocilo', kodaCaka() ? 'Ustvarite račun ali se prijavite – vašo kuhinjo bomo nato dodali samodejno.' : '');
+        sporoci('dobro-sporocilo', kodaCaka() ? 'Ustvarite račun ali se prijavite – luč bomo nato dodali samodejno.' : '');
         return;
       }
       if (dogodek === 'SIGNED_IN' && prej && prej.id === uporabnik.id) return;
       if (dogodek === 'SIGNED_IN' || dogodek === 'INITIAL_SESSION') {
         const k = vzemiKodo();
-        if (k) { pokazi('v-domovi'); await prevzemi(k); } else if (!trenutna) { naloziDomove(); }
+        if (k) { await obdelajKodo(k); } else if (!trenutna) { naloziDomove(); }
       }
     }, 0);
   });

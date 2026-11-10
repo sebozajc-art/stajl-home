@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nalepke Stajl Home</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+  body { margin:0; background:#f4f3f1; color:#2b2a28; font-family:"Helvetica Neue", Helvetica, Arial, sans-serif; }
+  .orodja { max-width:760px; margin:0 auto; padding:20px 16px; }
+  .orodja h1 { font-weight:400; font-size:24px; margin:0 0 8px; }
+  .orodja p { font-size:13px; color:#8d8a84; margin:4px 0 12px; }
+  .vrsta { display:flex; gap:8px; margin-bottom:6px; }
+  .vrsta input { font:inherit; font-size:15px; padding:9px; border:1px solid #cfcdc8; background:#fbfaf8; flex:1; }
+  .vrsta input.koda { flex:0 0 120px; text-transform:uppercase; }
+  button { font:inherit; font-size:14px; padding:11px 16px; border:0; background:#3a3836; color:#f4f3f1; border-radius:999px; cursor:pointer; margin:8px 8px 0 0; }
+  button.sek { background:transparent; color:#2b2a28; border:1px solid #cfcdc8; }
+  .list { display:flex; flex-wrap:wrap; gap:4mm; padding:8mm; background:#fff; max-width:760px; margin:16px auto; }
+  .nal { width:38mm; height:52mm; border:0.3mm solid #cfcdc8; border-radius:2mm; padding:3mm; box-sizing:border-box;
+         display:flex; flex-direction:column; align-items:center; justify-content:space-between; background:#fff; }
+  .nal img.logo { width:12mm; }
+  .nal .qr svg { width:26mm; height:26mm; display:block; }
+  .nal .ime { font-size:9pt; font-weight:500; text-align:center; border-bottom:0.3mm solid #2b2a28; min-width:28mm; padding-bottom:0.5mm; min-height:4mm; }
+  .nal .koda { font-size:6.5pt; letter-spacing:.12em; color:#6b6862; }
+  @media print { .orodja { display:none; } body { background:#fff; } .list { margin:0; padding:0; max-width:none; } @page { margin:8mm; } }
+</style>
+</head>
+<body>
+<div class="orodja">
+  <h1>Nalepke Stajl Home</h1>
+  <p>Za vsako luč vpišite kodo in ime (ime bo natisnjeno na nalepki). Prazno ime = na nalepko ga napišete ročno.</p>
+  <div id="vrste"></div>
+  <button class="sek" id="b-vrsta">+ Dodaj vrstico</button>
+  <button id="b-tisk">Natisni nalepke</button>
+</div>
+<div class="list" id="list"></div>
+<script>
+(function () {
+  const APP = 'https://sebozajc-art.github.io/stajl-home/?koda=';
+  const q = new URLSearchParams(location.search);
+  const kode = (q.get('kode') || '').split(',').filter(Boolean);
+  const imena = (q.get('imena') || '').split(',');
+  const vrste = document.getElementById('vrste');
+  function dodaj(k, i) {
+    const d = document.createElement('div'); d.className = 'vrsta';
+    d.innerHTML = '<input class="koda" placeholder="KODA" maxlength="12"><input class="ime" placeholder="Ime luči, npr. Vitrina" maxlength="30">';
+    d.querySelector('.koda').value = k || ''; d.querySelector('.ime').value = i || '';
+    d.oninput = narisi; vrste.appendChild(d);
+  }
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function narisi() {
+    const list = document.getElementById('list'); list.innerHTML = '';
+    vrste.querySelectorAll('.vrsta').forEach(v => {
+      const k = v.querySelector('.koda').value.trim().toUpperCase(); const ime = v.querySelector('.ime').value.trim();
+      if (!/^[A-Z0-9]{6,12}$/.test(k)) return;
+      const qr = qrcode(0, 'M'); qr.addData(APP + k); qr.make();
+      const n = document.createElement('div'); n.className = 'nal';
+      n.innerHTML = '<img class="logo" src="logo-stajl.png" alt="Stajl"><div class="qr">' + qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true }) +
+        '</div><div class="ime">' + esc(ime) + '</div><div class="koda">' + k + '</div>';
+      list.appendChild(n);
+    });
+  }
+  if (kode.length) kode.forEach((k, i) => dodaj(k, imena[i])); else for (let i = 0; i < 4; i++) dodaj('', '');
+  document.getElementById('b-vrsta').onclick = () => dodaj('', '');
+  document.getElementById('b-tisk').onclick = () => window.print();
+  narisi();
+})();
+</script>
+</body>
+</html>
