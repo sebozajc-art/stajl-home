@@ -172,7 +172,8 @@
   .scena-cip.uredi { outline:1px solid var(--les); outline-offset:-1px; }
   .scena-cip.blisk { background:var(--aktivno); color:#f4f3f1; }
   .scene-vrsta { gap:6px !important; }
-  .spodnje-povezave { display:flex; justify-content:space-between; margin-top:22px; }
+  .spodnje-povezave { display:flex; justify-content:center; margin-top:26px; }
+  .moznost.nevarno b { color:var(--napaka); }
   .spodnje-povezave .povezava { font-size:12px; }
   .vrsta-vnos { display:flex; gap:12px; align-items:flex-end; }
   .vrsta-vnos input { flex:1; }
@@ -230,13 +231,16 @@
 <body>
 <svg class="ozadje" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
   <g fill="none" stroke="#cdbda8" stroke-width="1">
+    <g transform="translate(0,-175)">
     <path d="M-40 70 C 80 10, 160 130, 260 60 S 420 10, 460 90"/>
     <path d="M-40 110 C 70 50, 170 170, 270 100 S 420 60, 460 135"/>
     <path d="M-40 155 C 60 100, 180 210, 280 145 S 420 110, 460 180"/>
+    </g><g transform="translate(0,95)">
     <path d="M-40 620 C 90 580, 150 700, 250 650 S 410 580, 460 660"/>
     <path d="M-40 665 C 80 625, 160 750, 260 695 S 410 630, 460 708"/>
     <path d="M-40 710 C 70 670, 170 800, 270 740 S 410 680, 460 756"/>
     <path d="M-40 755 C 60 715, 180 850, 280 785 S 410 730, 460 804"/>
+    </g>
   </g>
 </svg>
 <div class="list-ozadje" id="list-dodaj" aria-hidden="true">
@@ -270,6 +274,15 @@
       <button class="gl" type="submit" data-t="shrani"></button>
     </form>
     <button class="sek" id="b-prostor-zapri" style="margin-top:10px" data-t="preklici"></button>
+  </div>
+</div>
+<div class="list-ozadje" id="list-meni-prostor" aria-hidden="true">
+  <div class="list" role="dialog" aria-modal="true" aria-labelledby="meni-prostor-naslov">
+    <div class="rocaj"></div>
+    <h2 id="meni-prostor-naslov"></h2>
+    <button class="moznost" id="b-preimenuj-prostor" type="button"><span class="ik"></span><span><b data-t="imeInIkona"></b><small data-t="imeInIkonaPod"></small></span></button>
+    <button class="moznost nevarno" id="b-izbrisi-prostor" type="button"><span class="ik"></span><span><b id="izbrisi-prostor-besedilo"></b><small data-t="izbrisiProstorPod"></small></span></button>
+    <button class="sek" id="b-meni-prostor-zapri" style="margin-top:14px" data-t="zapri"></button>
   </div>
 </div>
 <div class="list-ozadje" id="list-domovi" aria-hidden="true">
@@ -397,8 +410,7 @@
     <div class="oznaka" id="oznaka-luci" data-t="luci"></div>
     <div class="mreza" id="cone"></div>
     <div class="spodnje-povezave">
-      <button class="povezava" id="b-preimenuj-prostor" type="button" data-t="urediProstor"></button>
-      <button class="povezava" id="b-izbrisi-prostor" type="button"></button>
+      <button class="mali-gumb" id="b-uredi-prostor" type="button"><span data-t="urediProstor"></span></button>
     </div>
   </section>
 
@@ -534,7 +546,7 @@
       eposta: 'E-pošta', geslo: 'Geslo', ostani: 'Ostani prijavljen', pozabljeno: 'Pozabljeno geslo',
       nimateRacuna: 'Nimate računa? <b>Ustvari račun</b>', euPodatki: 'Podatki so shranjeni v EU. Zgodovina uporabe luči se ne hrani.',
       novoGeslo: 'Novo geslo', novoGesloPod: 'Vpišite novo geslo (vsaj 8 znakov).', shraniGeslo: 'Shrani geslo', obnovaKorak1: 'Vpišite e-pošto računa. Poslali vam bomo kodo za novo geslo.', obnovaKorak2: 'Kodo smo poslali na {email}. Vpišite jo in izberite novo geslo.', posljiKodo: 'Pošlji kodo', kodaIzMaila: 'Koda iz e-pošte', novoGesloPolje: 'Novo geslo (vsaj 8 znakov)', posljiNovoKodo: 'Pošlji novo kodo', potrdiKodo: 'Potrdi kodo', ponoviGeslo: 'Ponovite novo geslo', eGeslaRazlicna: 'Gesli se ne ujemata.', obnovaKorak3: 'Koda je potrjena. Vpišite novo geslo.', posljiZnova: 'Ponovno pošiljanje čez {s} s', nazajNaPrijavo: '← Nazaj na prijavo', velja: 'Koda velja še {cas}', kodaPotekla: 'Koda je potekla. Pošljite novo kodo.', eKodaObnove: 'Koda ni pravilna ali je potekla.', ePosiljanje: 'E-pošte trenutno ni bilo mogoče poslati. Poskusite znova čez nekaj minut.', gesloSpremenjeno: 'Geslo je spremenjeno.',
-      naprave: 'Naprave', prostori: 'Prostori', prostor: 'Prostor', ikona: 'Ikona', urediProstor: 'Uredi prostor', katKuhinja: 'Kuhinja', katDnevna: 'Dnevna in jedilnica', katSpalnica: 'Spalnica', katKopalnica: 'Kopalnica', katSplosno: 'Splošno', uredi: 'Uredi', koncano: 'Končano', vseUgasni: 'Vse ugasni', scena: 'Scena',
+      naprave: 'Naprave', prostori: 'Prostori', prostor: 'Prostor', ikona: 'Ikona', urediProstor: 'Uredi prostor', imeInIkona: 'Ime in ikona', imeInIkonaPod: 'Preimenujte prostor ali izberite drugo ikono', izbrisiProstorPod: 'Luči ostanejo v napravi, iz prostora se odstranijo', katKuhinja: 'Kuhinja', katDnevna: 'Dnevna in jedilnica', katSpalnica: 'Spalnica', katKopalnica: 'Kopalnica', katSplosno: 'Splošno', uredi: 'Uredi', koncano: 'Končano', vseUgasni: 'Vse ugasni', scena: 'Scena',
       gori1: '{n} luč gori', gori2: '{n} luči gorita', gori3: '{n} luči gorijo', goriN: '{n} luči gori', ugasnjeno: 'Ugasnjeno', vseUgasnjeno: 'Vse luči so ugasnjene', brezLuci: 'Še brez luči',
       prostorPrazen: 'Pritisnite »+ Dodaj« in skenirajte QR kodo na nalepki luči.', novProstor: 'Nov prostor', imeProstora: 'Ime prostora', imeProstoraPh: 'npr. Kuhinja, Dnevna', preimenujProstor: 'Preimenuj prostor', izbrisiProstor: 'Izbriši prostor', resIzbrisi: 'Tapnite še enkrat za potrditev', eImeProstora: 'Vpišite ime prostora.', aliNovProstor: 'ali vpišite nov prostor',
       imeLuciNaslov: 'Ime luči', imeShranjenoLuc: 'Ime je shranjeno.', premakni: 'Premakni v prostor', odstraniLuc: 'Odstrani luč iz prostora', napraveNaslov: 'Naprave', napraveNasvet: 'Krmilniki Stajl v vaših domovih. Tu preverite povezavo in poimenujete izhode.', niNaprav: 'Ni dodanih naprav.', demoProstor: 'Demo kuhinja',
@@ -583,7 +595,7 @@
       eposta: 'Email', geslo: 'Password', ostani: 'Stay signed in', pozabljeno: 'Forgot password',
       nimateRacuna: 'No account yet? <b>Create account</b>', euPodatki: 'Data is stored in the EU. No history of light usage is kept.',
       novoGeslo: 'New password', novoGesloPod: 'Enter a new password (at least 8 characters).', shraniGeslo: 'Save password', obnovaKorak1: 'Enter your account email. We will send you a code for a new password.', obnovaKorak2: 'We sent a code to {email}. Enter it and choose a new password.', posljiKodo: 'Send code', kodaIzMaila: 'Code from email', novoGesloPolje: 'New password (at least 8 characters)', posljiNovoKodo: 'Send a new code', potrdiKodo: 'Confirm code', ponoviGeslo: 'Repeat new password', eGeslaRazlicna: 'The passwords do not match.', obnovaKorak3: 'Code confirmed. Enter a new password.', posljiZnova: 'Resend in {s} s', nazajNaPrijavo: '← Back to sign in', velja: 'Code valid for {cas}', kodaPotekla: 'The code has expired. Send a new one.', eKodaObnove: 'The code is wrong or has expired.', ePosiljanje: 'The email could not be sent right now. Please try again in a few minutes.', gesloSpremenjeno: 'Password changed.',
-      naprave: 'Devices', prostori: 'Rooms', prostor: 'Room', ikona: 'Icon', urediProstor: 'Edit room', katKuhinja: 'Kitchen', katDnevna: 'Living and dining', katSpalnica: 'Bedroom', katKopalnica: 'Bathroom', katSplosno: 'General', uredi: 'Edit', koncano: 'Done', vseUgasni: 'All off', scena: 'Scene',
+      naprave: 'Devices', prostori: 'Rooms', prostor: 'Room', ikona: 'Icon', urediProstor: 'Edit room', imeInIkona: 'Name and icon', imeInIkonaPod: 'Rename the room or choose another icon', izbrisiProstorPod: 'Lights stay on the device and are removed from this room', katKuhinja: 'Kitchen', katDnevna: 'Living and dining', katSpalnica: 'Bedroom', katKopalnica: 'Bathroom', katSplosno: 'General', uredi: 'Edit', koncano: 'Done', vseUgasni: 'All off', scena: 'Scene',
       gori1: '{n} light on', gori2: '{n} lights on', gori3: '{n} lights on', goriN: '{n} lights on', ugasnjeno: 'Off', vseUgasnjeno: 'All lights are off', brezLuci: 'No lights yet',
       prostorPrazen: 'Tap “+ Add” and scan the QR code on the light sticker.', novProstor: 'New room', imeProstora: 'Room name', imeProstoraPh: 'e.g. Kitchen, Living room', preimenujProstor: 'Rename room', izbrisiProstor: 'Delete room', resIzbrisi: 'Tap again to confirm', eImeProstora: 'Enter a room name.', aliNovProstor: 'or type a new room',
       imeLuciNaslov: 'Light name', imeShranjenoLuc: 'Name saved.', premakni: 'Move to room', odstraniLuc: 'Remove light from room', napraveNaslov: 'Devices', napraveNasvet: 'Stajl controllers in your homes. Check the connection and name the outputs here.', niNaprav: 'No devices yet.', demoProstor: 'Demo kitchen',
@@ -1160,7 +1172,6 @@
     trenutniProstor = p; trenutna = p;
     pokazi('v-naprava');
     $('naprava-ime').textContent = p.ime;
-    $('b-izbrisi-prostor').textContent = t('izbrisiProstor'); $('b-izbrisi-prostor').dataset.potrdi = '';
     narisiProstor();
     zazeniOsvezevanje();
   }
@@ -1228,12 +1239,22 @@
     poslji(u);
   }
   $('b-dodaj-luc').onclick = odpriList;
-  $('b-preimenuj-prostor').onclick = () => odpriListProstor('preimenuj');
+  function zapriMeniProstor() { $('list-meni-prostor').classList.remove('odprto'); $('list-meni-prostor').setAttribute('aria-hidden', 'true'); }
+  $('b-preimenuj-prostor').querySelector('.ik').innerHTML = svg('l_predal');
+  $('b-izbrisi-prostor').querySelector('.ik').innerHTML = svg('ugasni');
+  $('b-uredi-prostor').onclick = () => {
+    $('meni-prostor-naslov').textContent = trenutniProstor.ime;
+    $('b-izbrisi-prostor').dataset.potrdi = ''; $('izbrisi-prostor-besedilo').textContent = t('izbrisiProstor');
+    $('list-meni-prostor').classList.add('odprto'); $('list-meni-prostor').setAttribute('aria-hidden', 'false');
+  };
+  $('b-meni-prostor-zapri').onclick = zapriMeniProstor;
+  $('list-meni-prostor').onclick = (e) => { if (e.target.id === 'list-meni-prostor') zapriMeniProstor(); };
+  $('b-preimenuj-prostor').onclick = () => { zapriMeniProstor(); setTimeout(() => odpriListProstor('preimenuj'), 200); };
   $('b-izbrisi-prostor').onclick = async (e) => {
     const b = e.currentTarget;
-    if (!b.dataset.potrdi) { b.dataset.potrdi = '1'; b.textContent = t('resIzbrisi'); return; }
+    if (!b.dataset.potrdi) { b.dataset.potrdi = '1'; $('izbrisi-prostor-besedilo').textContent = t('resIzbrisi'); return; }
     await sb.from('prostori').delete().eq('id', trenutniProstor.id);
-    naloziDomove();
+    zapriMeniProstor(); naloziDomove();
   };
   $('b-nazaj').onclick = () => naloziDomove();
 
