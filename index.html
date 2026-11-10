@@ -100,9 +100,26 @@
   .cip.izbran { background:var(--aktivno); color:#f4f3f1; border-color:var(--aktivno); }
   .mali { font:inherit; font-size:11px; letter-spacing:.12em; text-transform:uppercase; padding:7px 12px; border:1px solid var(--les); border-radius:999px; background:transparent; color:var(--les); cursor:pointer; }
 
+  .p { position:relative; }
+  .p .vec { position:absolute; top:8px; right:8px; width:34px; height:34px; border:0; background:transparent; color:inherit; opacity:.55; font-size:18px; cursor:pointer; }
+  .stikalo { width:56px; height:32px; border-radius:16px; background:var(--crta); position:relative; border:0; transition:background .2s; cursor:pointer; flex:none; }
+  .stikalo::after { content:''; position:absolute; top:3px; left:3px; width:26px; height:26px; border-radius:50%; background:#fff; transition:left .2s; }
+  .stikalo.on { background:var(--aktivno); } .stikalo.on::after { left:27px; }
+  .velika { background:var(--plosca); border-radius:6px; padding:22px 18px; }
+  .velika .vrsta { display:flex; justify-content:space-between; align-items:center; }
+  .velika .odst { font-size:44px; font-weight:200; letter-spacing:-.02em; }
+  input[type=range] { width:100%; margin:18px 0 4px; accent-color:var(--aktivno); height:30px; padding:0; border:0; }
+  .urnik { display:flex; justify-content:space-between; align-items:center; gap:10px; background:var(--plosca); border-radius:6px; padding:14px 16px; margin-bottom:4px; }
+  .urnik .cas { font-size:22px; font-weight:300; }
+  .urnik .opis { font-size:11px; color:var(--siva); letter-spacing:.1em; text-transform:uppercase; margin-top:3px; }
+  .urnik .x { background:none; border:0; color:var(--siva); font-size:20px; cursor:pointer; padding:4px 6px; }
+  .urnik.ne { opacity:.5; }
+  .obrazec-urnik { background:var(--plosca); border-radius:6px; padding:16px; margin-top:4px; }
+  input[type=time] { font-size:28px !important; font-weight:300; }
   .prazno { color:var(--siva); font-size:14px; padding:26px 0; text-align:center; grid-column:1 / -1; line-height:1.5; }
   .noga { font-size:11px; color:#aaa7a1; text-align:center; margin-top:22px; letter-spacing:.06em; }
   .noga a { color:inherit; }
+  .znamka { font-size:12px; color:var(--siva); letter-spacing:.04em; padding:2px 0 4px; }
   .skrito { display:none !important; }
   .razdelek { border-top:1px solid var(--crta); padding-top:6px; margin-top:22px; }
   .stolpec { display:flex; flex-direction:column; gap:10px; }
@@ -121,6 +138,7 @@
   </g>
 </svg>
 <div class="ovoj">
+  <div class="znamka skrito" id="znamka">Stajl Home</div>
 
   <!-- DOBRODOŠLICA -->
   <section id="v-dobro" class="skrito">
@@ -200,6 +218,36 @@
     <div class="oznaka" data-t="sceneNaslov"></div>
     <div class="mreza" id="scene"></div>
     <button class="povezava les" id="b-uredi" data-t="urediImena"></button>
+  </section>
+
+  <!-- LUČ (podrobnosti) -->
+  <section id="v-luc" class="skrito">
+    <div class="vrh"><button class="tg puscica levo" id="b-nazaj-podr" data-t-aria="nazaj">←</button><img src="logo-mono.png" alt="Stajl"><span class="desno"></span></div>
+    <h1 id="luc-ime"></h1>
+    <div class="podnaslov" id="luc-pod"></div>
+    <div class="velika">
+      <div class="vrsta"><span class="odst" id="luc-odst"></span><button class="stikalo" id="luc-stikalo" data-t-aria="prizgiUgasni"></button></div>
+      <input type="range" id="luc-drsnik" min="1" max="100" value="100" data-t-aria="svetlost">
+    </div>
+    <div class="oznaka" data-t="urnik"></div>
+    <div id="seznam-urnikov"></div>
+    <button class="sek" id="b-nov-urnik" data-t="dodajUrnik"></button>
+    <div class="obrazec-urnik skrito" id="obrazec-urnik">
+      <div class="sporocilo" id="urnik-sporocilo"></div>
+      <label for="urnik-ura" data-t="ura"></label>
+      <input type="time" id="urnik-ura" value="07:00">
+      <label data-t="dnevi"></label>
+      <div class="cipi" id="urnik-dnevi"></div>
+      <label data-t="dejanje"></label>
+      <div class="cipi" id="urnik-dejanje"></div>
+      <div id="urnik-svetlost-vrsta"><label for="urnik-svetlost"><span data-t="svetlost"></span> <span id="urnik-svetlost-odst"></span></label>
+      <input type="range" id="urnik-svetlost" min="1" max="100" value="80"></div>
+      <label data-t="postopno"></label>
+      <div class="cipi" id="urnik-trajanje"></div>
+      <button class="gl" id="b-shrani-urnik" data-t="shrani"></button>
+      <button class="povezava" id="b-preklici-urnik" data-t="preklici"></button>
+    </div>
+    <div class="noga" data-t="urnikNasvet"></div>
   </section>
 
   <!-- NOVA LUČ -->
@@ -283,7 +331,12 @@
       ePrevec: 'Preveč poskusov. Poskusite čez nekaj minut.', ePrevzeta: 'Ta naprava že ima lastnika. Za dostop naj vas lastnik povabi.',
       eLastnik: 'To lahko spremeni samo lastnik.', eOmrezje: 'Ni povezave z internetom.', eNajprejEposta: 'Najprej vpišite svoj e-poštni naslov.',
       potrdiEposto: 'Poslali smo vam e-pošto. Kliknite povezavo za potrditev, nato se prijavite.', ponastavitev: 'Če račun obstaja, smo vam poslali povezavo za novo geslo.',
-      temneje: 'Temneje', svetleje: 'Svetleje',
+      temneje: 'Temneje', svetleje: 'Svetleje', vec: 'Več', prizgiUgasni: 'Prižgi ali ugasni', svetlost: 'Svetlost',
+      urnik: 'Urnik', dodajUrnik: '+ Dodaj urnik', ura: 'Ura', dnevi: 'Dnevi', dejanje: 'Dejanje', prizgi: 'Prižgi', ugasni: 'Ugasni',
+      vsakDan: 'vsak dan', delavniki: 'delavniki', vikend: 'vikend', niUrnikov: 'Ni urnikov. Luč se lahko prižge ali ugasne sama ob izbrani uri.',
+      urnikNasvet: 'Urniki delujejo prek oblaka Stajl, zato mora biti naprava povezana z internetom.', eDnevi: 'Izberite vsaj en dan.',
+      postopno: 'Postopno', takoj: 'Takoj', minN: '{n} min', postopnoOpis: 'postopno {n} min',
+      dneviKratko: ['Po', 'To', 'Sr', 'Če', 'Pe', 'So', 'Ne'], lucUgasnjena: 'Ugasnjena', lucPrizgana: 'Prižgana',
       privzeto: ['Pult', 'Zgornje omare', 'Vitrina', 'Podnožje'],
       predlogi: ['Pult', 'Zgornje omare', 'Vitrina', 'Podnožje', 'Notranjost omar', 'Strop', 'Polica'],
       scene: ['Kuhanje', 'Večer', 'Noč', 'Vse ugasni']
@@ -315,7 +368,12 @@
       ePrevec: 'Too many attempts. Please try again in a few minutes.', ePrevzeta: 'This device already has an owner. Ask the owner to invite you.',
       eLastnik: 'Only the owner can change this.', eOmrezje: 'No internet connection.', eNajprejEposta: 'Enter your email address first.',
       potrdiEposto: 'We sent you an email. Click the link to confirm, then sign in.', ponastavitev: 'If the account exists, we sent you a link to set a new password.',
-      temneje: 'Dimmer', svetleje: 'Brighter',
+      temneje: 'Dimmer', svetleje: 'Brighter', vec: 'More', prizgiUgasni: 'Turn on or off', svetlost: 'Brightness',
+      urnik: 'Schedule', dodajUrnik: '+ Add schedule', ura: 'Time', dnevi: 'Days', dejanje: 'Action', prizgi: 'Turn on', ugasni: 'Turn off',
+      vsakDan: 'every day', delavniki: 'weekdays', vikend: 'weekend', niUrnikov: 'No schedules. The light can turn on or off by itself at a set time.',
+      urnikNasvet: 'Schedules run through the Stajl cloud, so the device must be connected to the internet.', eDnevi: 'Choose at least one day.',
+      postopno: 'Gradually', takoj: 'Instantly', minN: '{n} min', postopnoOpis: 'fade {n} min',
+      dneviKratko: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'], lucUgasnjena: 'Off', lucPrizgana: 'On',
       privzeto: ['Countertop', 'Wall cabinets', 'Display cabinet', 'Plinth'],
       predlogi: ['Countertop', 'Wall cabinets', 'Display cabinet', 'Plinth', 'Inside cabinets', 'Ceiling', 'Shelf'],
       scene: ['Cooking', 'Evening', 'Night', 'All off']
@@ -381,13 +439,15 @@
     else if (trenutniPogled === 'v-domovi') naloziDomove();
     else if (trenutniPogled === 'v-novaluc') narisiCipeLuci();
     else if (trenutniPogled === 'v-uredi' && urejana) odpriUreditev(urejana, poPrevzemu);
+    else if (trenutniPogled === 'v-luc' && trenutna) { narisiLuc(); naloziUrnike(); if (!$('obrazec-urnik').classList.contains('skrito')) narisiObrazecUrnika(); }
   }
 
   // ---------- pomožno ----------
   function pokazi(v) {
     trenutniPogled = v;
-    ['v-dobro', 'v-prijava', 'v-novogeslo', 'v-domovi', 'v-naprava', 'v-novaluc', 'v-uredi', 'v-nastavitve'].forEach(x => $(x).classList.toggle('skrito', x !== v));
-    if (v !== 'v-naprava' && v !== 'v-uredi') { clearInterval(osvezevanje); osvezevanje = null; }
+    $('znamka').classList.toggle('skrito', v === 'v-dobro');
+    ['v-dobro', 'v-prijava', 'v-novogeslo', 'v-domovi', 'v-naprava', 'v-luc', 'v-novaluc', 'v-uredi', 'v-nastavitve'].forEach(x => $(x).classList.toggle('skrito', x !== v));
+    if (v !== 'v-naprava' && v !== 'v-uredi' && v !== 'v-luc') { clearInterval(osvezevanje); osvezevanje = null; }
     window.scrollTo(0, 0);
   }
   function sporoci(el, tekst, napaka) {
@@ -614,9 +674,12 @@
       const c = imeKanala(d, i);
       const p = document.createElement('div');
       p.className = 'p';
-      p.innerHTML = `<div class="ik">${svg(c.ikona)}</div><div class="ime">${esc(c.ime)}</div>
+      p.innerHTML = `<button class="vec" aria-label="${esc(t('vec'))}">›</button><div class="ik">${svg(c.ikona)}</div><div class="ime">${esc(c.ime)}</div>
         <div class="spodaj"><span class="vr"></span><span class="gumbi"><button class="g" data-k="-1" aria-label="${esc(t('temneje'))}">−</button><button class="g" data-k="1" aria-label="${esc(t('svetleje'))}">+</button></span></div>`;
-      p.onclick = (e) => klikLuci(i, e);
+      let dolgo = null, odprto = false;
+      p.addEventListener('pointerdown', () => { odprto = false; dolgo = setTimeout(() => { odprto = true; odpriLuc(i); }, 550); });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => p.addEventListener(ev, () => clearTimeout(dolgo)));
+      p.onclick = (e) => { if (odprto) return; if (e.target.closest('.vec')) return odpriLuc(i); klikLuci(i, e); };
       cone.appendChild(p);
       luci[i] = { on: false, b: 100, el: p };
     }
@@ -654,6 +717,7 @@
     const l = luci[i];
     l.el.classList.toggle('on', l.on);
     l.el.querySelector('.vr').textContent = l.on ? l.b + ' %' : t('izklop');
+    if (trenutniPogled === 'v-luc' && odprtaLuc === i) narisiLuc();
   }
 
   async function osveziNapravo() {
@@ -685,6 +749,100 @@
     const u = Object.keys(luci).map(Number).map(i => s.nastavi[i] ? { k: i, on: true, b: s.nastavi[i] } : { k: i, on: false });
     if (u.length) poslji(u);
   }
+
+  // ---------- podrobnosti luči in urnik ----------
+  let odprtaLuc = null, drsnikCas = 0, drsnikTimer = null, urnikDnevi = [1, 2, 3, 4, 5, 6, 7], urnikPrizgi = true, urnikTrajanje = 0;
+  function odpriLuc(i) {
+    odprtaLuc = i;
+    const c = imeKanala(trenutna, i);
+    pokazi('v-luc');
+    $('luc-ime').textContent = c.ime;
+    $('obrazec-urnik').classList.add('skrito'); $('b-nov-urnik').classList.remove('skrito');
+    narisiLuc(); naloziUrnike();
+    clearInterval(osvezevanje); osvezevanje = setInterval(osveziNapravo, 2000);
+  }
+  function narisiLuc() {
+    const l = luci[odprtaLuc]; if (!l) return;
+    $('luc-odst').textContent = l.on ? l.b + ' %' : t('lucUgasnjena');
+    $('luc-stikalo').classList.toggle('on', l.on);
+    if (document.activeElement !== $('luc-drsnik')) $('luc-drsnik').value = l.b || 100;
+    $('luc-pod').textContent = trenutna ? trenutna.name : '';
+  }
+  $('luc-stikalo').onclick = () => { const l = luci[odprtaLuc]; poslji([{ k: odprtaLuc, on: !l.on, b: l.on ? null : (l.b || 100) }]); };
+  $('luc-drsnik').oninput = () => {
+    const v = +$('luc-drsnik').value; $('luc-odst').textContent = v + ' %';
+    clearTimeout(drsnikTimer);
+    if (Date.now() - drsnikCas > 300) { drsnikCas = Date.now(); poslji([{ k: odprtaLuc, on: true, b: v }]); }
+    else drsnikTimer = setTimeout(() => poslji([{ k: odprtaLuc, on: true, b: v }]), 320);
+  };
+  $('luc-drsnik').onchange = () => poslji([{ k: odprtaLuc, on: true, b: +$('luc-drsnik').value }]);
+  $('b-nazaj-podr').onclick = () => odpriNapravo(trenutna);
+
+  function opisDni(d) {
+    const s = [...d].sort().join(',');
+    if (s === '1,2,3,4,5,6,7') return t('vsakDan');
+    if (s === '1,2,3,4,5') return t('delavniki');
+    if (s === '6,7') return t('vikend');
+    return [...d].sort().map(x => t('dneviKratko')[x - 1]).join(' ');
+  }
+  async function naloziUrnike() {
+    const el = $('seznam-urnikov');
+    const { data, error } = await sb.from('urniki').select('id,ura,dnevi,prizgi,svetlost,aktiven,trajanje').eq('device_id', trenutna.id).eq('channel', odprtaLuc).order('ura');
+    if (error) { el.innerHTML = `<div class="prazno">${esc(prevedi(error))}</div>`; return; }
+    if (!data.length) { el.innerHTML = `<div class="prazno" style="padding:12px 0 16px">${esc(t('niUrnikov'))}</div>`; return; }
+    el.innerHTML = '';
+    data.forEach(u => {
+      const r = document.createElement('div');
+      r.className = 'urnik' + (u.aktiven ? '' : ' ne');
+      const dej = (u.prizgi ? `${t('prizgi')} ${u.svetlost || 100} %` : t('ugasni')) + (u.trajanje ? ' · ' + t('postopnoOpis', { n: Math.round(u.trajanje / 60) }) : '');
+      r.innerHTML = `<div><div class="cas">${esc(u.ura.slice(0, 5))}</div><div class="opis">${esc(opisDni(u.dnevi))} · ${esc(dej)}</div></div>
+        <div style="display:flex; align-items:center; gap:6px"><button class="stikalo ${u.aktiven ? 'on' : ''}" aria-label="${esc(t('prizgiUgasni'))}"></button><button class="x" aria-label="×">×</button></div>`;
+      r.querySelector('.stikalo').onclick = async () => { await sb.from('urniki').update({ aktiven: !u.aktiven }).eq('id', u.id); naloziUrnike(); };
+      r.querySelector('.x').onclick = async () => { await sb.from('urniki').delete().eq('id', u.id); naloziUrnike(); };
+      el.appendChild(r);
+    });
+  }
+  function narisiObrazecUrnika() {
+    const d = $('urnik-dnevi'); d.innerHTML = '';
+    t('dneviKratko').forEach((ime, x) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cip' + (urnikDnevi.includes(x + 1) ? ' izbran' : ''); b.textContent = ime;
+      b.onclick = () => { urnikDnevi = urnikDnevi.includes(x + 1) ? urnikDnevi.filter(y => y !== x + 1) : urnikDnevi.concat(x + 1); narisiObrazecUrnika(); };
+      d.appendChild(b);
+    });
+    const a = $('urnik-dejanje'); a.innerHTML = '';
+    [[true, t('prizgi')], [false, t('ugasni')]].forEach(([v, ime]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cip' + (urnikPrizgi === v ? ' izbran' : ''); b.textContent = ime;
+      b.onclick = () => { urnikPrizgi = v; narisiObrazecUrnika(); };
+      a.appendChild(b);
+    });
+    const tr = $('urnik-trajanje'); tr.innerHTML = '';
+    [0, 300, 900, 1800].forEach(v => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cip' + (urnikTrajanje === v ? ' izbran' : '');
+      b.textContent = v ? t('minN', { n: v / 60 }) : t('takoj');
+      b.onclick = () => { urnikTrajanje = v; narisiObrazecUrnika(); };
+      tr.appendChild(b);
+    });
+    $('urnik-svetlost-vrsta').classList.toggle('skrito', !urnikPrizgi);
+    $('urnik-svetlost-odst').textContent = $('urnik-svetlost').value + ' %';
+  }
+  $('urnik-svetlost').oninput = () => { $('urnik-svetlost-odst').textContent = $('urnik-svetlost').value + ' %'; };
+  $('b-nov-urnik').onclick = () => {
+    urnikDnevi = [1, 2, 3, 4, 5, 6, 7]; urnikPrizgi = true; urnikTrajanje = 0; $('urnik-ura').value = '07:00'; $('urnik-svetlost').value = 80;
+    sporoci('urnik-sporocilo', ''); narisiObrazecUrnika();
+    $('obrazec-urnik').classList.remove('skrito'); $('b-nov-urnik').classList.add('skrito');
+  };
+  $('b-preklici-urnik').onclick = () => { $('obrazec-urnik').classList.add('skrito'); $('b-nov-urnik').classList.remove('skrito'); };
+  $('b-shrani-urnik').onclick = async () => {
+    if (!urnikDnevi.length) return sporoci('urnik-sporocilo', t('eDnevi'), true);
+    const { error } = await sb.from('urniki').insert({
+      device_id: trenutna.id, channel: odprtaLuc, ura: $('urnik-ura').value || '07:00', dnevi: [...urnikDnevi].sort(),
+      prizgi: urnikPrizgi, svetlost: urnikPrizgi ? +$('urnik-svetlost').value : null, trajanje: urnikTrajanje,
+      tz: (Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Ljubljana')
+    });
+    if (error) return sporoci('urnik-sporocilo', prevedi(error), true);
+    $('obrazec-urnik').classList.add('skrito'); $('b-nov-urnik').classList.remove('skrito');
+    naloziUrnike();
+  };
 
   // ---------- nastavitve ----------
   $('b-nastavitve').onclick = () => {

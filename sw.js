@@ -1,5 +1,5 @@
 // Stajl Home – service worker: aplikacijska lupina deluje tudi ob slabi povezavi
-const PREDPOMNILNIK = 'stajl-home-v4';
+const PREDPOMNILNIK = 'stajl-home-v5';
 const LUPINA = ['./', './index.html', './manifest.json', './ikona-180.png', './ikona-512.png', './logo-stajl.png', './logo-mono.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(PREDPOMNILNIK).then(c => c.addAll(LUPINA)).then(() => self.skipWaiting()));
