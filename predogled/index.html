@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="ikona-stajl-180.png">
 <link rel="icon" href="ikona-stajl-180.png">
 <style>
-  :root { --stran:#f4f3f1; --plosca:#e9e8e5; --crta:#cfcdc8; --tekst:#2b2a28; --siva:#8d8a84;
+  :root { --stran:#f4f3f1; --plosca:#e9e8e5; --crta:#bebbb5; --tekst:#252422; --siva:#6f6c66;
           --aktivno:#3a3836; --les:#a0784e; --napaka:#a3442f; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html, body { margin:0; background:var(--stran); color:var(--tekst);
@@ -53,7 +53,8 @@
 
   /* obrazci */
   form { display:flex; flex-direction:column; gap:4px; }
-  label { font-size:11px; color:var(--siva); letter-spacing:.16em; text-transform:uppercase; margin-top:14px; }
+  input::placeholder { color:#9a968f; }
+  label { font-size:11px; color:#5f5c57; letter-spacing:.16em; text-transform:uppercase; margin-top:14px; }
   input:not([type=checkbox]) { font:inherit; font-size:17px; padding:10px 0; border:0; border-bottom:1px solid var(--crta);
           background:transparent; color:var(--tekst); border-radius:0; width:100%; }
   input:not([type=checkbox]):focus { outline:none; border-bottom-color:var(--tekst); }
@@ -152,7 +153,15 @@
   .pozdrav .crta { width:0; height:1px; background:var(--les); margin-top:22px; transition:width 1.1s ease .5s; }
   .pozdrav.igra img { opacity:1; transform:none; } .pozdrav.igra .dob { opacity:1; transform:none; } .pozdrav.igra .zn { opacity:1; } .pozdrav.igra .crta { width:64px; }
   @media (prefers-reduced-motion: reduce) { .pozdrav * { transition:none !important; } }
-  .dodaj-vrh { background:var(--tekst); color:var(--stran); border:0; border-radius:999px; padding:9px 16px; font:inherit; font-size:12px; letter-spacing:.06em; cursor:pointer; white-space:nowrap; }
+  .dom-naslov { display:flex; align-items:baseline; gap:10px; background:none; border:0; padding:0; margin:18px 0 4px; font:inherit; color:var(--tekst); cursor:pointer; text-align:left; }
+  .dom-naslov #dom-ime { font-size:34px; font-weight:200; letter-spacing:-.01em; line-height:1.1; }
+  .dom-naslov .dol { font-size:18px; color:var(--siva); transform:translateY(-4px); }
+  .dom-vrsta { display:flex; align-items:center; gap:8px; background:var(--plosca); border-radius:8px; padding:4px 6px 4px 16px; margin-top:6px; }
+  .dom-vrsta .izb { flex:1; background:none; border:0; text-align:left; font:inherit; font-size:16px; color:var(--tekst); padding:14px 0; cursor:pointer; }
+  .dom-vrsta .izb.trenutni::after { content:'  ✓'; color:var(--les); }
+  .dom-vrsta .mali { background:none; border:0; color:var(--siva); font:inherit; font-size:12px; letter-spacing:.06em; padding:10px 8px; cursor:pointer; }
+  .dom-vrsta input { flex:1; font-size:16px !important; padding:12px 0 !important; border-bottom:1px solid var(--tekst) !important; background:transparent; }
+  .dodaj-vrh { background:var(--tekst); color:var(--stran); border:0; border-radius:999px; padding:7px 13px; font:inherit; font-size:11px; letter-spacing:.06em; cursor:pointer; white-space:nowrap; }
   .list-ozadje { position:fixed; inset:0; z-index:40; background:rgba(30,28,25,.35); display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
   .list-ozadje.odprto { opacity:1; pointer-events:auto; }
   .list { background:var(--stran); width:100%; max-width:520px; border-radius:18px 18px 0 0; padding:10px 22px calc(22px + env(safe-area-inset-bottom)); transform:translateY(100%); transition:transform .32s cubic-bezier(.2,.7,.2,1); }
@@ -210,6 +219,16 @@
       <button class="gl" type="submit" data-t="dodaj"></button>
     </form>
     <button class="sek" id="b-list-zapri" style="margin-top:10px" data-t="preklici"></button>
+  </div>
+</div>
+<div class="list-ozadje" id="list-domovi" aria-hidden="true">
+  <div class="list" role="dialog" aria-modal="true" aria-labelledby="domovi-naslov">
+    <div class="rocaj"></div>
+    <h2 id="domovi-naslov" data-t="mojiDomovi"></h2>
+    <div class="sporocilo" id="domovi-sporocilo"></div>
+    <div id="seznam-domovov"></div>
+    <button class="sek" id="b-nov-dom" style="margin-top:14px" data-t="novDom"></button>
+    <button class="sek" id="b-domovi-zapri" style="margin-top:10px" data-t="zapri"></button>
   </div>
 </div>
 <div class="kamera skrito" id="kamera">
@@ -288,8 +307,8 @@
 
   <!-- MOJI DOMOVI -->
   <section id="v-domovi" class="skrito">
-    <div class="vrh"><button class="dodaj-vrh levo" id="b-dodaj-napravo" data-t="dodajNapravo"></button><img src="logo-mono.png" alt="Stajl"><button class="tg desno" id="b-nastavitve" data-t="nastavitve"></button></div>
-    <h1 data-t="mojiDomovi"></h1>
+    <div class="vrh"><button class="tg levo" id="b-nastavitve" data-t="nastavitve"></button><img src="logo-mono.png" alt="Stajl"><button class="dodaj-vrh desno" id="b-dodaj-napravo" data-t="dodajNapravo"></button></div>
+    <button class="dom-naslov" id="b-domovi" aria-haspopup="dialog"><span id="dom-ime">Stajl Home</span><span class="dol">⌄</span></button>
     <div class="podnaslov" id="domovi-pod"></div>
     <div class="sporocilo" id="dodaj-sporocilo"></div>
     <div id="seznam-domov"></div>
@@ -386,6 +405,9 @@
     <h1 data-t="nastavitve"></h1>
     <div class="podnaslov" id="moj-email"></div>
     <div class="sporocilo" id="nast-sporocilo"></div>
+    <div class="dvojno"><div><label for="n-ime" data-t="ime"></label><input id="n-ime" maxlength="40" autocomplete="given-name"></div>
+      <div><label for="n-priimek" data-t="priimek"></label><input id="n-priimek" maxlength="40" autocomplete="family-name"></div></div>
+    <button class="sek" id="b-shrani-ime" style="margin-top:14px" data-t="shrani"></button>
     <div class="oznaka" data-t="jezikNaslov"></div>
     <div class="jezik" data-jezik style="font-size:14px"></div>
     <div class="oznaka" data-t="racun"></div>
@@ -420,7 +442,7 @@
       eposta: 'E-pošta', geslo: 'Geslo', ostani: 'Ostani prijavljen', pozabljeno: 'Pozabljeno geslo',
       nimateRacuna: 'Nimate računa? <b>Ustvari račun</b>', euPodatki: 'Podatki so shranjeni v EU. Zgodovina uporabe luči se ne hrani.',
       novoGeslo: 'Novo geslo', novoGesloPod: 'Vpišite novo geslo (vsaj 8 znakov).', shraniGeslo: 'Shrani geslo',
-      nastavitve: 'Nastavitve', mojiDomovi: 'Moji domovi', domovi: 'Domovi', demo: 'Preizkusi Demo kuhinjo',
+      naprave: 'Naprave', nastavitve: 'Nastavitve', mojiDomovi: 'Moji domovi', privzetiDom: 'Stajl Home', novDom: '+ Nov dom', novDomIme: 'Nov dom', preimenuj: 'Preimenuj', izbrisiDom: 'Izbriši', shraniKratko: 'Shrani', zapri: 'Zapri', eDomZadnji: 'Vsaj en dom mora ostati.', eDomIme: 'Vpišite ime doma.', zeObstaja: 'Račun s tem e-naslovom že obstaja. Prijavite se ali izberite »Pozabljeno geslo«.', imeInPriimek: 'Ime in priimek', imeShranjeno: 'Ime je shranjeno.', domovi: 'Domovi', demo: 'Preizkusi Demo kuhinjo',
       dodajLuc: 'Dodaj luč ali kuhinjo', kodaNalepke: 'Koda z nalepke', kodaPrimer: 'npr. A1B2C3D4', dodaj: 'Dodaj',
       skenirajNasvet: 'Ali pa QR kodo na nalepki skenirajte s kamero telefona.',
       luci: 'Luči', sceneNaslov: 'Scene', urediImena: 'Uredi imena luči',
@@ -465,7 +487,7 @@
       eposta: 'Email', geslo: 'Password', ostani: 'Stay signed in', pozabljeno: 'Forgot password',
       nimateRacuna: 'No account yet? <b>Create account</b>', euPodatki: 'Data is stored in the EU. No history of light usage is kept.',
       novoGeslo: 'New password', novoGesloPod: 'Enter a new password (at least 8 characters).', shraniGeslo: 'Save password',
-      nastavitve: 'Settings', mojiDomovi: 'My homes', domovi: 'Homes', demo: 'Try the demo kitchen',
+      naprave: 'Devices', nastavitve: 'Settings', mojiDomovi: 'My homes', privzetiDom: 'Stajl Home', novDom: '+ New home', novDomIme: 'New home', preimenuj: 'Rename', izbrisiDom: 'Delete', shraniKratko: 'Save', zapri: 'Close', eDomZadnji: 'At least one home must remain.', eDomIme: 'Enter a home name.', zeObstaja: 'An account with this email already exists. Sign in or choose “Forgot password”.', imeInPriimek: 'Full name', imeShranjeno: 'Name saved.', domovi: 'Homes', demo: 'Try the demo kitchen',
       dodajLuc: 'Add a light or kitchen', kodaNalepke: 'Code from the sticker', kodaPrimer: 'e.g. A1B2C3D4', dodaj: 'Add',
       skenirajNasvet: 'Or scan the QR code on the sticker with your phone camera.',
       luci: 'Lights', sceneNaslov: 'Scenes', urediImena: 'Edit light names',
@@ -581,7 +603,7 @@
   // ---------- pomožno ----------
   function pokazi(v) {
     trenutniPogled = v;
-    $('znamka').classList.toggle('skrito', v === 'v-dobro');
+    $('znamka').classList.toggle('skrito', v === 'v-dobro' || v === 'v-domovi');
     ['v-dobro', 'v-prijava', 'v-novogeslo', 'v-domovi', 'v-naprava', 'v-luc', 'v-novaluc', 'v-uredi', 'v-scena', 'v-nastavitve'].forEach(x => $(x).classList.toggle('skrito', x !== v));
     if (v !== 'v-naprava' && v !== 'v-uredi' && v !== 'v-luc') { clearInterval(osvezevanje); osvezevanje = null; }
     window.scrollTo(0, 0);
@@ -656,7 +678,8 @@
       if (registracija) {
         const { data, error } = await sb.auth.signUp({ email, password: geslo, options: { emailRedirectTo: location.origin + location.pathname, data: { ime, priimek, full_name: ime + ' ' + priimek } } });
         if (error) throw error;
-        if (!data.session) { nastaviNacin(false); sporoci('prijava-sporocilo', t('potrdiEposto')); }
+        if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) { nastaviNacin(false, true); sporoci('prijava-sporocilo', t('zeObstaja'), true); }
+        else if (!data.session) { nastaviNacin(false); sporoci('prijava-sporocilo', t('potrdiEposto')); }
       } else {
         const { error } = await sb.auth.signInWithPassword({ email, password: geslo });
         if (error) throw error;
@@ -703,17 +726,41 @@
   // ---------- domovi ----------
   function jeNaVoljo(d) { return !!d.demo || (d.last_seen && (Date.now() - new Date(d.last_seen).getTime()) < 20000); }
 
+  let domovi = [], trenutniDom = null;
+  function shraniDom(id) { trenutniDom = id; try { localStorage.setItem('stajl_dom', id); } catch (_) {} }
+  let domoviObljuba = null;
+  function naloziSeznamDomov() { if (!domoviObljuba) domoviObljuba = _naloziSeznamDomov().finally(() => { domoviObljuba = null; }); return domoviObljuba; }
+  async function _naloziSeznamDomov() {
+    let { data } = await sb.from('domovi').select('id,ime').order('created_at');
+    if (!data || !data.length) {
+      const r = await sb.from('domovi').insert({ ime: t('privzetiDom') }).select('id,ime');
+      data = r.data || [];
+    }
+    domovi = data;
+    let z = null; try { z = localStorage.getItem('stajl_dom'); } catch (_) {}
+    if (!domovi.some(d => d.id === z)) z = domovi.length ? domovi[0].id : null;
+    trenutniDom = z;
+  }
   async function naloziDomove(sporocilo) {
     pokazi('v-domovi');
     sporoci('dodaj-sporocilo', sporocilo || '');
-    const { data, error } = await sb.from('devices').select(IZBRANO).order('name');
+    await naloziSeznamDomov();
+    const dom = domovi.find(d => d.id === trenutniDom);
+    $('dom-ime').textContent = dom ? dom.ime : t('privzetiDom');
+    const [{ data, error }, cl] = await Promise.all([
+      sb.from('devices').select(IZBRANO).order('name'),
+      sb.from('device_members').select('device_id,dom_id')
+    ]);
     const el = $('seznam-domov');
     if (error) { el.innerHTML = `<div class="prazno">${esc(prevedi(error))}</div>`; return; }
-    $('domovi-pod').textContent = data.length ? `${t('domovi')} · ${data.length}` : '';
+    const domNaprave = {}; (cl.data || []).forEach(c => domNaprave[c.device_id] = c.dom_id);
+    // naprave brez doma gredo v trenutni dom
+    for (const d of data) if (!domNaprave[d.id] && trenutniDom) { domNaprave[d.id] = trenutniDom; sb.rpc('nastavi_dom', { p_device: d.id, p_dom: trenutniDom }); }
+    const vDomu = data.filter(d => domNaprave[d.id] === trenutniDom);
+    $('domovi-pod').textContent = vDomu.length ? `${t('naprave')} · ${vDomu.length}` : '';
     $('b-demo').classList.toggle('skrito', !POKAZI_DEMO || data.some(d => d.demo));
-    if (!data.length) { el.innerHTML = ''; return; }
     el.innerHTML = '';
-    data.forEach(d => {
+    vDomu.forEach(d => {
       const n = Object.values(d.state || {}).filter(s => s && s.on).length;
       const st = d.demo ? t('domStanjeDemo', { n }) : (jeNaVoljo(d) ? t('domStanjeOk', { n }) : t('domStanjeNi'));
       const div = document.createElement('div');
@@ -724,9 +771,58 @@
     });
   }
 
+  // ---------- domovi: izbira, preimenovanje, nov dom ----------
+  function zapriDomove() { $('list-domovi').classList.remove('odprto'); $('list-domovi').setAttribute('aria-hidden', 'true'); }
+  function narisiDomove(urejaj) {
+    const el = $('seznam-domovov'); el.innerHTML = '';
+    domovi.forEach(d => {
+      const v = document.createElement('div'); v.className = 'dom-vrsta';
+      if (urejaj === d.id) {
+        v.innerHTML = `<input maxlength="40"><button class="mali" type="button">${esc(t('shraniKratko'))}</button>`;
+        const inp = v.querySelector('input'); inp.value = d.ime;
+        const shrani = async () => {
+          const ime = inp.value.trim(); if (!ime) return sporoci('domovi-sporocilo', t('eDomIme'), true);
+          const { error } = await sb.from('domovi').update({ ime }).eq('id', d.id);
+          if (error) return sporoci('domovi-sporocilo', prevedi(error), true);
+          d.ime = ime; if (d.id === trenutniDom) $('dom-ime').textContent = ime; sporoci('domovi-sporocilo', ''); narisiDomove();
+        };
+        v.querySelector('.mali').onclick = shrani; inp.onkeydown = (e) => { if (e.key === 'Enter') shrani(); };
+        el.appendChild(v); setTimeout(() => { inp.focus(); inp.select(); }, 30); return;
+      }
+      v.innerHTML = `<button class="izb ${d.id === trenutniDom ? 'trenutni' : ''}" type="button"></button><button class="mali" type="button">${esc(t('preimenuj'))}</button>${domovi.length > 1 ? `<button class="mali brisi" type="button">${esc(t('izbrisiDom'))}</button>` : ''}`;
+      v.querySelector('.izb').textContent = d.ime;
+      v.querySelector('.izb').onclick = () => { shraniDom(d.id); zapriDomove(); naloziDomove(); };
+      v.querySelector('.mali').onclick = () => narisiDomove(d.id);
+      const b = v.querySelector('.brisi');
+      if (b) b.onclick = async () => {
+        if (domovi.length < 2) return sporoci('domovi-sporocilo', t('eDomZadnji'), true);
+        const drug = domovi.find(x => x.id !== d.id);
+        const { data: cl } = await sb.from('device_members').select('device_id,dom_id');
+        await Promise.all((cl || []).filter(c => c.dom_id === d.id).map(c => sb.rpc('nastavi_dom', { p_device: c.device_id, p_dom: drug.id })));
+        await sb.from('domovi').delete().eq('id', d.id);
+        domovi = domovi.filter(x => x.id !== d.id);
+        if (trenutniDom === d.id) { shraniDom(drug.id); naloziDomove(); }
+        narisiDomove();
+      };
+      el.appendChild(v);
+    });
+  }
+  $('b-domovi').onclick = () => {
+    sporoci('domovi-sporocilo', ''); narisiDomove();
+    $('list-domovi').classList.add('odprto'); $('list-domovi').setAttribute('aria-hidden', 'false');
+  };
+  $('b-domovi-zapri').onclick = zapriDomove;
+  $('list-domovi').onclick = (e) => { if (e.target.id === 'list-domovi') zapriDomove(); };
+  $('b-nov-dom').onclick = async () => {
+    const { data, error } = await sb.from('domovi').insert({ ime: t('novDomIme') }).select('id,ime');
+    if (error || !data || !data[0]) return sporoci('domovi-sporocilo', prevedi(error || {}), true);
+    domovi.push(data[0]); narisiDomove(data[0].id);
+  };
+
   async function prevzemi(koda) {
     const { data, error } = await sb.rpc('prevzemi_napravo', { p_koda: koda });
     if (error) { pokazi('v-domovi'); sporoci('dodaj-sporocilo', prevedi(error), true); return false; }
+    if (trenutniDom) await sb.rpc('nastavi_dom', { p_device: data, p_dom: trenutniDom });
     const r = await sb.from('devices').select(IZBRANO).eq('id', data).maybeSingle();
     if (r.data && !imaImena(r.data)) { odpriUreditev(r.data, true); return data; }
     await naloziDomove(t('kuhinjaDodana'));
@@ -1157,9 +1253,19 @@
   // ---------- nastavitve ----------
   $('b-nastavitve').onclick = () => {
     pokazi('v-nastavitve');
-    $('moj-email').textContent = uporabnik ? [((uporabnik.user_metadata || {}).full_name || ''), uporabnik.email].filter(Boolean).join(' · ') : '';
+    const m = (uporabnik && uporabnik.user_metadata) || {};
+    $('moj-email').textContent = uporabnik ? uporabnik.email : '';
+    $('n-ime').value = m.ime || ''; $('n-priimek').value = m.priimek || '';
     $('potrdi-izbris').classList.remove('vidno');
     sporoci('nast-sporocilo', '');
+  };
+  $('b-shrani-ime').onclick = async () => {
+    const ime = $('n-ime').value.trim(), priimek = $('n-priimek').value.trim();
+    if (!ime || !priimek) return sporoci('nast-sporocilo', t('eIme'), true);
+    const { data, error } = await sb.auth.updateUser({ data: { ime, priimek, full_name: ime + ' ' + priimek } });
+    if (error) return sporoci('nast-sporocilo', prevedi(error), true);
+    if (data && data.user) uporabnik = data.user;
+    sporoci('nast-sporocilo', t('imeShranjeno'));
   };
   $('b-uredi').onclick = () => { if (trenutna) odpriUreditev(trenutna, false); };
   $('b-nazaj').onclick = () => { trenutna = null; naloziDomove(); };
