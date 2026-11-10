@@ -152,6 +152,21 @@
   .pozdrav .crta { width:0; height:1px; background:var(--les); margin-top:22px; transition:width 1.1s ease .5s; }
   .pozdrav.igra img { opacity:1; transform:none; } .pozdrav.igra .dob { opacity:1; transform:none; } .pozdrav.igra .zn { opacity:1; } .pozdrav.igra .crta { width:64px; }
   @media (prefers-reduced-motion: reduce) { .pozdrav * { transition:none !important; } }
+  .dodaj-vrh { background:var(--tekst); color:var(--stran); border:0; border-radius:999px; padding:9px 16px; font:inherit; font-size:12px; letter-spacing:.06em; cursor:pointer; white-space:nowrap; }
+  .list-ozadje { position:fixed; inset:0; z-index:40; background:rgba(30,28,25,.35); display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .25s; }
+  .list-ozadje.odprto { opacity:1; pointer-events:auto; }
+  .list { background:var(--stran); width:100%; max-width:520px; border-radius:18px 18px 0 0; padding:10px 22px calc(22px + env(safe-area-inset-bottom)); transform:translateY(100%); transition:transform .32s cubic-bezier(.2,.7,.2,1); }
+  .list-ozadje.odprto .list { transform:none; }
+  .list .rocaj { width:38px; height:4px; border-radius:2px; background:var(--crta); margin:0 auto 16px; }
+  .list h2 { font-weight:300; font-size:24px; margin:0 0 4px; }
+  .moznost { display:flex; gap:16px; align-items:center; width:100%; text-align:left; background:var(--plosca); border:0; border-radius:8px; padding:18px 16px; margin-top:10px; font:inherit; color:var(--tekst); cursor:pointer; }
+  .moznost .ik svg { width:28px; height:28px; } .moznost b { display:block; font-weight:500; font-size:15px; } .moznost small { display:block; color:var(--siva); font-size:12px; margin-top:3px; }
+  .kamera { position:fixed; inset:0; z-index:60; background:#000; }
+  .kamera video { width:100%; height:100%; object-fit:cover; }
+  .kamera .okvir { position:absolute; left:50%; top:45%; width:64vmin; height:64vmin; transform:translate(-50%,-50%); border:1.5px solid rgba(255,255,255,.9); border-radius:18px; box-shadow:0 0 0 100vmax rgba(0,0,0,.45); }
+  .kamera-besedilo { position:absolute; left:0; right:0; top:calc(45% + 36vmin); text-align:center; color:#fff; font-size:14px; letter-spacing:.04em; padding:0 24px; }
+  .kamera-sporocilo { position:absolute; left:0; right:0; top:calc(45% + 36vmin + 30px); text-align:center; color:#f3c9b9; font-size:13px; padding:0 24px; }
+  .kamera-zapri { position:absolute; left:50%; bottom:calc(36px + env(safe-area-inset-bottom)); transform:translateX(-50%); background:rgba(255,255,255,.92); color:#222; border:0; border-radius:999px; padding:13px 34px; font:inherit; font-size:13px; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; }
   .skrito { display:none !important; }
   .razdelek { border-top:1px solid var(--crta); padding-top:6px; margin-top:22px; }
   .stolpec { display:flex; flex-direction:column; gap:10px; }
@@ -169,6 +184,31 @@
     <path d="M-40 755 C 60 715, 180 850, 280 785 S 410 730, 460 804"/>
   </g>
 </svg>
+<div class="list-ozadje" id="list-dodaj" aria-hidden="true">
+  <div class="list" role="dialog" aria-modal="true" aria-labelledby="list-naslov">
+    <div class="rocaj"></div>
+    <h2 id="list-naslov" data-t="dodajNapravoNaslov"></h2>
+    <div class="podnaslov" data-t="dodajNapravoPod"></div>
+    <div id="list-izbira">
+      <button class="moznost" id="b-skeniraj"><span class="ik"></span><span><b data-t="skenirajQR"></b><small data-t="skenirajQRPod"></small></span></button>
+      <button class="moznost" id="b-rocno"><span class="ik"></span><span><b data-t="vpisiRocno"></b><small data-t="vpisiRocnoPod"></small></span></button>
+    </div>
+    <form id="f-dodaj" class="skrito" novalidate>
+      <label for="koda" data-t="kodaNalepke"></label>
+      <input id="koda" autocomplete="off" autocapitalize="characters" maxlength="12" data-t-ph="kodaPrimer">
+      <div class="sporocilo" id="list-sporocilo"></div>
+      <button class="gl" type="submit" data-t="dodaj"></button>
+    </form>
+    <button class="sek" id="b-list-zapri" style="margin-top:10px" data-t="preklici"></button>
+  </div>
+</div>
+<div class="kamera skrito" id="kamera">
+  <video id="kamera-video" playsinline muted></video>
+  <div class="okvir"></div>
+  <div class="kamera-besedilo" data-t="usmeriKamero"></div>
+  <div class="kamera-sporocilo" id="kamera-sporocilo"></div>
+  <button class="kamera-zapri" id="b-kamera-zapri" data-t="preklici"></button>
+</div>
 <div class="pozdrav" id="pozdrav" aria-live="polite"><img src="logo-mono.png" alt=""><div class="dob" id="pozdrav-besedilo"></div><div class="crta"></div><div class="zn">Stajl Home</div></div>
 <div class="ovoj">
   <div class="znamka skrito" id="znamka">Stajl Home</div>
@@ -237,22 +277,12 @@
 
   <!-- MOJI DOMOVI -->
   <section id="v-domovi" class="skrito">
-    <div class="vrh"><span class="levo"></span><img src="logo-mono.png" alt="Stajl"><button class="tg desno" id="b-nastavitve" data-t="nastavitve"></button></div>
+    <div class="vrh"><button class="dodaj-vrh levo" id="b-dodaj-napravo" data-t="dodajNapravo"></button><img src="logo-mono.png" alt="Stajl"><button class="tg desno" id="b-nastavitve" data-t="nastavitve"></button></div>
     <h1 data-t="mojiDomovi"></h1>
     <div class="podnaslov" id="domovi-pod"></div>
+    <div class="sporocilo" id="dodaj-sporocilo"></div>
     <div id="seznam-domov"></div>
-    <button class="gl" id="b-dodaj-napravo" data-t="dodajNapravo"></button>
-    <button class="sek" id="b-demo" style="margin-top:10px" data-t="demo"></button>
-    <div class="razdelek skrito" id="razdelek-dodaj">
-      <div class="oznaka" data-t="dodajLuc"></div>
-      <div class="sporocilo" id="dodaj-sporocilo"></div>
-      <form id="f-dodaj" novalidate>
-        <label for="koda" data-t="kodaNalepke"></label>
-        <input id="koda" autocomplete="off" autocapitalize="characters" maxlength="12" data-t-ph="kodaPrimer">
-        <button class="gl" type="submit" data-t="dodaj"></button>
-      </form>
-      <div class="noga" data-t="skenirajNasvet"></div>
-    </div>
+    <button class="sek" id="b-demo" style="margin-top:18px" data-t="demo"></button>
   </section>
 
   <!-- NAPRAVA -->
@@ -373,7 +403,7 @@
       ustvari: 'Ustvari račun', zePrijava: 'Že imate račun? <b>Prijava</b>', zasebnost: 'Politika zasebnosti', nazaj: 'Nazaj',
       prijava: 'Prijava', prijavaPod: 'Dobrodošli nazaj', registracijaPod: 'Postanite član Stajl Home',
       ime: 'Ime', priimek: 'Priimek', eIme: 'Vpišite ime in priimek.', dobrodosli: 'Dobrodošli, {ime}', dobrodosliBrez: 'Dobrodošli',
-      dodajNapravo: '+ Dodaj napravo', odDo: 'Od–do', do: 'Do', okno: '{od}–{do}',
+      dodajNapravo: '+ Dodaj', dodajNapravoNaslov: 'Dodaj napravo', dodajNapravoPod: 'Na nalepki luči ali kuhinje je QR koda in koda iz 8 znakov.', skenirajQR: 'Skeniraj QR kodo', skenirajQRPod: 'Odpre se kamera', vpisiRocno: 'Vpiši kodo ročno', vpisiRocnoPod: 'Koda z nalepke, npr. A1B2C3D4', usmeriKamero: 'Usmerite kamero v QR kodo na nalepki', eKamera: 'Kamere ni bilo mogoče odpreti. Dovolite dostop do kamere ali vpišite kodo ročno.', eQR: 'To ni koda Stajl Home.', odDo: 'Od–do', do: 'Do', okno: '{od}–{do}',
       zApple: 'Nadaljuj z Apple', zGoogle: 'Nadaljuj z Google', aliEposta: 'ali z e-pošto', pokaziGeslo: 'Pokaži geslo',
       gesloNamig: 'Vsaj 8 znakov.', capsLock: 'Caps Lock je vklopljen.', eSocial: 'Prijava s tem računom še ni na voljo. Uporabite e-pošto.',
       eposta: 'E-pošta', geslo: 'Geslo', ostani: 'Ostani prijavljen', pozabljeno: 'Pozabljeno geslo',
@@ -391,7 +421,7 @@
       lucN: 'Luč {n}', pokazi: 'Pokaži', sveti: 'Sveti …', niPriklopljeno: 'Ni priklopljeno', niPriklopljenoPh: 'ni priklopljeno',
       izklop: 'izklop', povezano: 'Povezano', niPovezana: 'Ni povezana', demoStanje: 'Demo', ukazNi: 'Ukaz ni uspel',
       prizgane: 'prižgane {n} od {m}', domStanjeDemo: 'demo · prižgane {n}', domStanjeOk: 'povezano · prižgane {n}', domStanjeNi: 'ni povezave',
-      niDomov: 'Še nimate dodane luči. Skenirajte QR kodo na nalepki ali preizkusite Demo kuhinjo.',
+      niDomov: 'Še nimate dodane naprave. Pritisnite »+ Dodaj« zgoraj ali preizkusite Demo kuhinjo.',
       kodaCaka: 'Ustvarite račun ali se prijavite – luč bomo nato dodali samodejno.',
       kuhinjaDodana: 'Kuhinja je dodana v vaš račun.', lucDodana: 'Luč je dodana.', zadnjiKorak: 'Kuhinja je dodana v vaš račun. Še zadnji korak:',
       eNapacna: 'Vpišite veljaven e-poštni naslov.', eGeslo: 'Geslo mora imeti vsaj 8 znakov.', eKoda: 'Vpišite kodo z nalepke (črke in številke).',
@@ -418,7 +448,7 @@
       ustvari: 'Create account', zePrijava: 'Already have an account? <b>Sign in</b>', zasebnost: 'Privacy policy', nazaj: 'Back',
       prijava: 'Sign in', prijavaPod: 'Welcome back', registracijaPod: 'Become a Stajl Home member',
       ime: 'First name', priimek: 'Last name', eIme: 'Enter your first and last name.', dobrodosli: 'Welcome, {ime}', dobrodosliBrez: 'Welcome',
-      dodajNapravo: '+ Add device', odDo: 'From–to', do: 'Until', okno: '{od}–{do}',
+      dodajNapravo: '+ Add', dodajNapravoNaslov: 'Add device', dodajNapravoPod: 'The light or kitchen sticker has a QR code and an 8-character code.', skenirajQR: 'Scan QR code', skenirajQRPod: 'Opens the camera', vpisiRocno: 'Enter code manually', vpisiRocnoPod: 'Code from the sticker, e.g. A1B2C3D4', usmeriKamero: 'Point the camera at the QR code on the sticker', eKamera: 'Could not open the camera. Allow camera access or enter the code manually.', eQR: 'This is not a Stajl Home code.', odDo: 'From–to', do: 'Until', okno: '{od}–{do}',
       zApple: 'Continue with Apple', zGoogle: 'Continue with Google', aliEposta: 'or with email', pokaziGeslo: 'Show password',
       gesloNamig: 'At least 8 characters.', capsLock: 'Caps Lock is on.', eSocial: 'Signing in with this account is not available yet. Please use email.',
       eposta: 'Email', geslo: 'Password', ostani: 'Stay signed in', pozabljeno: 'Forgot password',
@@ -436,7 +466,7 @@
       lucN: 'Light {n}', pokazi: 'Show', sveti: 'On …', niPriklopljeno: 'Not connected', niPriklopljenoPh: 'not connected',
       izklop: 'off', povezano: 'Connected', niPovezana: 'Offline', demoStanje: 'Demo', ukazNi: 'Command failed',
       prizgane: '{n} of {m} on', domStanjeDemo: 'demo · {n} on', domStanjeOk: 'connected · {n} on', domStanjeNi: 'offline',
-      niDomov: 'No lights added yet. Scan the QR code on the sticker or try the demo kitchen.',
+      niDomov: 'No devices yet. Tap “+ Add” at the top or try the demo kitchen.',
       kodaCaka: 'Create an account or sign in – we will then add the light automatically.',
       kuhinjaDodana: 'The kitchen has been added to your account.', lucDodana: 'The light has been added.', zadnjiKorak: 'The kitchen has been added. One last step:',
       eNapacna: 'Enter a valid email address.', eGeslo: 'The password must have at least 8 characters.', eKoda: 'Enter the code from the sticker (letters and numbers).',
@@ -494,6 +524,8 @@
   ];
   const IKONE = {
     plus: '<path d="M12 5v14M5 12h14"/>',
+    qr: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2M14 18h2M18 18h2v2M18 16v2"/>',
+    tipke: '<rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h1M9.5 10h1M13 10h1M16.5 10h1M7 14h10"/>',
     luc: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
     pult: '<path d="M2 9h20M4 9v11M20 9v11M4 15h16"/><path d="M7 5.5l1 1.5M12 4v2.5M17 5.5l-1 1.5"/>',
     omare: '<rect x="3" y="4" width="18" height="10"/><path d="M12 4v10M10 8v2M14 8v2"/><path d="M6 17.5h12" stroke-dasharray="1.5 2"/>',
@@ -666,8 +698,6 @@
     if (error) { el.innerHTML = `<div class="prazno">${esc(prevedi(error))}</div>`; return; }
     $('domovi-pod').textContent = `${t('domovi')} · ${data.length}`;
     $('b-demo').classList.toggle('skrito', data.some(d => d.demo));
-    $('razdelek-dodaj').classList.toggle('skrito', data.length > 0 && !sporocilo);
-    $('b-dodaj-napravo').classList.toggle('skrito', !$('razdelek-dodaj').classList.contains('skrito'));
     if (!data.length) { el.innerHTML = `<div class="prazno">${esc(t('niDomov'))}</div>`; return; }
     el.innerHTML = '';
     data.forEach(d => {
@@ -689,7 +719,69 @@
     await naloziDomove(t('kuhinjaDodana'));
     return data;
   }
-  $('b-dodaj-napravo').onclick = () => { $('razdelek-dodaj').classList.remove('skrito'); $('b-dodaj-napravo').classList.add('skrito'); setTimeout(() => $('koda').focus(), 50); };
+  // ---------- dodaj napravo: list, kamera ----------
+  $('b-skeniraj').querySelector('.ik').innerHTML = svg('qr');
+  $('b-rocno').querySelector('.ik').innerHTML = svg('tipke');
+  function odpriList() {
+    $('list-izbira').classList.remove('skrito'); $('f-dodaj').classList.add('skrito'); sporoci('list-sporocilo', '');
+    $('list-dodaj').classList.add('odprto'); $('list-dodaj').setAttribute('aria-hidden', 'false');
+  }
+  function zapriList() { $('list-dodaj').classList.remove('odprto'); $('list-dodaj').setAttribute('aria-hidden', 'true'); }
+  $('b-dodaj-napravo').onclick = odpriList;
+  $('b-list-zapri').onclick = zapriList;
+  $('list-dodaj').onclick = (e) => { if (e.target.id === 'list-dodaj') zapriList(); };
+  $('b-rocno').onclick = () => { $('list-izbira').classList.add('skrito'); $('f-dodaj').classList.remove('skrito'); setTimeout(() => $('koda').focus(), 80); };
+  let tok = null, skeniram = false;
+  function kodaIzQR(besedilo) {
+    try { const u = new URL(besedilo); const k = u.searchParams.get('koda'); if (k) return k.trim().toUpperCase(); } catch (_) {}
+    const k = String(besedilo || '').trim().toUpperCase();
+    return /^[A-Z0-9]{6,12}$/.test(k) ? k : null;
+  }
+  function naloziJsQR() {
+    if (window.jsQR) return Promise.resolve();
+    return new Promise((ok, ne) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'; sc.onload = ok; sc.onerror = ne; document.head.appendChild(sc); });
+  }
+  function ustaviKamero() {
+    skeniram = false;
+    if (tok) { tok.getTracks().forEach(x => x.stop()); tok = null; }
+    $('kamera').classList.add('skrito');
+  }
+  $('b-kamera-zapri').onclick = ustaviKamero;
+  $('b-skeniraj').onclick = async () => {
+    zapriList();
+    $('kamera-sporocilo').textContent = '';
+    $('kamera').classList.remove('skrito');
+    try {
+      tok = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+    } catch (_) { ustaviKamero(); odpriList(); $('b-rocno').onclick(); return sporoci('list-sporocilo', t('eKamera'), true); }
+    const v = $('kamera-video'); v.srcObject = tok; await v.play().catch(() => {});
+    let detektor = null;
+    if ('BarcodeDetector' in window) { try { detektor = new BarcodeDetector({ formats: ['qr_code'] }); } catch (_) {} }
+    if (!detektor) { try { await naloziJsQR(); } catch (_) {} }
+    const pl = document.createElement('canvas'), cx = pl.getContext('2d', { willReadFrequently: true });
+    skeniram = true;
+    const korak = async () => {
+      if (!skeniram) return;
+      let besedilo = null;
+      try {
+        if (v.readyState >= 2) {
+          if (detektor) { const r = await detektor.detect(v); if (r.length) besedilo = r[0].rawValue; }
+          else if (window.jsQR) {
+            const w = 480, h = Math.round(480 * v.videoHeight / v.videoWidth) || 480;
+            pl.width = w; pl.height = h; cx.drawImage(v, 0, 0, w, h);
+            const r = jsQR(cx.getImageData(0, 0, w, h).data, w, h); if (r) besedilo = r.data;
+          }
+        }
+      } catch (_) {}
+      if (besedilo) {
+        const k = kodaIzQR(besedilo);
+        if (k) { if (navigator.vibrate) navigator.vibrate(40); ustaviKamero(); await obdelajKodo(k); return; }
+        $('kamera-sporocilo').textContent = t('eQR');
+      }
+      setTimeout(korak, 180);
+    };
+    korak();
+  };
   $('b-demo').onclick = async () => {
     const { data, error } = await sb.rpc('ustvari_demo');
     if (error) return sporoci('dodaj-sporocilo', prevedi(error), true);
@@ -735,7 +827,8 @@
   $('f-dodaj').onsubmit = async (e) => {
     e.preventDefault();
     const k = $('koda').value.trim().toUpperCase();
-    if (!/^[A-Z0-9]{6,12}$/.test(k)) return sporoci('dodaj-sporocilo', t('eKoda'), true);
+    if (!/^[A-Z0-9]{6,12}$/.test(k)) return sporoci('list-sporocilo', t('eKoda'), true);
+    zapriList();
     if (await obdelajKodo(k)) $('koda').value = '';
   };
 
