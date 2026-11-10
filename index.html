@@ -108,6 +108,7 @@
     <h1>Moji domovi</h1>
     <div class="pod" id="domovi-pod"><b>Domovi</b></div>
     <div id="seznam-domov"></div>
+    <button class="sek" id="b-demo" style="width:100%; margin-top:10px">Preizkusi Demo kuhinjo</button>
     <div class="razdelek">
       <div class="naslov">Dodaj kuhinjo ali prostor</div>
       <div class="sporocilo" id="dodaj-sporocilo"></div>
@@ -287,22 +288,23 @@
   };
 
   // ---------- domovi ----------
-  function jeNaVoljo(d) { return d.last_seen && (Date.now() - new Date(d.last_seen).getTime()) < 20000; }
+  function jeNaVoljo(d) { return !!d.demo || d.last_seen && (Date.now() - new Date(d.last_seen).getTime()) < 20000; }
 
   async function naloziDomove(sporocilo) {
     pokazi('v-domovi');
     if (sporocilo) sporoci('dodaj-sporocilo', sporocilo); else sporoci('dodaj-sporocilo', '');
-    const { data, error } = await sb.from('devices').select('id,name,channels,state,last_seen').order('name');
+    const { data, error } = await sb.from('devices').select('id,name,channels,state,last_seen,demo').order('name');
     const el = $('seznam-domov');
     if (error) { el.innerHTML = `<div class="prazno">${esc(prevedi(error))}</div>`; return; }
     $('domovi-pod').innerHTML = `<b>Domovi</b>&nbsp;&nbsp;${data.length}`;
-    if (!data.length) { el.innerHTML = '<div class="prazno">Še nimate dodane kuhinje. Vpišite kodo z nalepke spodaj.</div>'; return; }
+    $('b-demo').classList.toggle('skrito', data.some(d => d.demo));
+    if (!data.length) { el.innerHTML = '<div class="prazno">Še nimate dodane kuhinje. Vpišite kodo z nalepke spodaj ali preizkusite Demo kuhinjo.</div>'; return; }
     el.innerHTML = '';
     data.forEach(d => {
       const prizgane = Object.values(d.state || {}).filter(s => s && s.on).length;
       const div = document.createElement('div');
       div.className = 'dom';
-      div.innerHTML = `<div><div class="im">${esc(d.name)}</div><div class="st"><span class="pika ${jeNaVoljo(d) ? 'ok' : ''}"></span>${jeNaVoljo(d) ? 'povezano · prižgane ' + prizgane : 'ni povezave'}</div></div><div class="pus">›</div>`;
+      div.innerHTML = `<div><div class="im">${esc(d.name)}</div><div class="st"><span class="pika ${jeNaVoljo(d) ? 'ok' : ''}"></span>${d.demo ? 'demo · prižgane ' + prizgane : (jeNaVoljo(d) ? 'povezano · prižgane ' + prizgane : 'ni povezave')}</div></div><div class="pus">›</div>`;
       div.onclick = () => odpriNapravo(d);
       el.appendChild(div);
     });
@@ -311,11 +313,17 @@
   async function prevzemi(koda) {
     const { data, error } = await sb.rpc('prevzemi_napravo', { p_koda: koda });
     if (error) { sporoci('dodaj-sporocilo', prevedi(error), true); return false; }
-    const r = await sb.from('devices').select('id,name,channels,state,last_seen').eq('id', data).maybeSingle();
+    const r = await sb.from('devices').select('id,name,channels,state,last_seen,demo').eq('id', data).maybeSingle();
     if (r.data && !imaImena(r.data)) { odpriUreditev(r.data, true); return data; }
     await naloziDomove('Kuhinja je dodana v vaš račun.');
     return data;
   }
+  $('b-demo').onclick = async () => {
+    const { data, error } = await sb.rpc('ustvari_demo');
+    if (error) return sporoci('dodaj-sporocilo', prevedi(error), true);
+    const r = await sb.from('devices').select('id,name,channels,state,last_seen,demo').eq('id', data).maybeSingle();
+    if (r.data) odpriNapravo(r.data); else naloziDomove();
+  };
   $('f-dodaj').onsubmit = async (e) => {
     e.preventDefault();
     const k = $('koda').value.trim().toUpperCase();
@@ -423,7 +431,7 @@
     }
     const ok = jeNaVoljo(d);
     $('pika').classList.toggle('ok', ok);
-    $('status').textContent = ok ? 'Povezano' : 'Naprava ni povezana';
+    $('status').textContent = d.demo ? 'Demo' : (ok ? 'Povezano' : 'Naprava ni povezana');
     const n = Object.values(luci).filter(l => l.on).length;
     $('povzetek').innerHTML = `<b>Dom</b>&nbsp;&nbsp;prižgane ${n} od ${Object.keys(luci).length}`;
   }
@@ -436,7 +444,7 @@
 
   async function osveziNapravo() {
     if (!trenutna) return;
-    const { data, error } = await sb.from('devices').select('id,name,channels,state,last_seen').eq('id', trenutna.id).maybeSingle();
+    const { data, error } = await sb.from('devices').select('id,name,channels,state,last_seen,demo').eq('id', trenutna.id).maybeSingle();
     if (!error && data) { trenutna = data; narisiStanje(data); }
   }
 
