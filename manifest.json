@@ -8,15 +8,21 @@
  "theme_color": "#f4f3f1",
  "icons": [
   {
-   "src": "ikona-180.png",
+   "src": "ikona-stajl-180.png",
    "sizes": "180x180",
    "type": "image/png"
   },
   {
-   "src": "ikona-512.png",
+   "src": "ikona-stajl-512.png",
    "sizes": "512x512",
    "type": "image/png",
-   "purpose": "any maskable"
+   "purpose": "any"
+  },
+  {
+   "src": "ikona-stajl-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
   }
  ],
  "id": "./",
