@@ -524,6 +524,8 @@
     { auth: { storage: shramba, persistSession: true, autoRefreshToken: true } });
 
   const KORAK = 10;
+  const POKAZI_DEMO = true; // kasneje false: gumb Demo kuhinja izgine
+
   const IKONE_PRIVZETO = ['pult', 'omare', 'vitrina', 'spodaj'];
   const UGANI_IKONO = [[/pult|delovn|counter|worktop/i, 'pult'], [/omar|visec|viseč|cabinet|upper|wall/i, 'omare'], [/vitrin|steklo|display|glass/i, 'vitrina'],
     [/podno|spod|plinth|kick|floor/i, 'spodaj'], [/notranj|predal|inside|drawer/i, 'notranjost']];
@@ -707,9 +709,9 @@
     const { data, error } = await sb.from('devices').select(IZBRANO).order('name');
     const el = $('seznam-domov');
     if (error) { el.innerHTML = `<div class="prazno">${esc(prevedi(error))}</div>`; return; }
-    $('domovi-pod').textContent = `${t('domovi')} · ${data.length}`;
-    $('b-demo').classList.toggle('skrito', data.some(d => d.demo));
-    if (!data.length) { el.innerHTML = `<div class="prazno">${esc(t('niDomov'))}</div>`; return; }
+    $('domovi-pod').textContent = data.length ? `${t('domovi')} · ${data.length}` : '';
+    $('b-demo').classList.toggle('skrito', !POKAZI_DEMO || data.some(d => d.demo));
+    if (!data.length) { el.innerHTML = ''; return; }
     el.innerHTML = '';
     data.forEach(d => {
       const n = Object.values(d.state || {}).filter(s => s && s.on).length;
