@@ -120,6 +120,19 @@
   .noga { font-size:11px; color:#aaa7a1; text-align:center; margin-top:22px; letter-spacing:.06em; }
   .noga a { color:inherit; }
   .znamka { font-size:12px; color:var(--siva); letter-spacing:.04em; padding:2px 0 4px; }
+  .socialno { display:flex; flex-direction:column; gap:10px; margin-top:6px; }
+  .soc { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; font:inherit; font-size:15px; padding:14px; border-radius:999px; cursor:pointer; }
+  .soc svg { width:18px; height:18px; flex:none; }
+  .soc.apple { background:#000; color:#fff; border:0; }
+  .soc.google { background:#fff; color:#2b2a28; border:1px solid var(--crta); }
+  .ali { display:flex; align-items:center; gap:12px; color:var(--siva); font-size:11px; letter-spacing:.16em; text-transform:uppercase; margin:22px 0 4px; }
+  .ali::before, .ali::after { content:''; flex:1; height:1px; background:var(--crta); }
+  .geslo-ovoj { position:relative; }
+  .geslo-ovoj input { padding-right:44px !important; }
+  .oko { position:absolute; right:0; bottom:6px; background:none; border:0; color:var(--siva); padding:6px; cursor:pointer; }
+  .oko svg { width:20px; height:20px; display:block; }
+  .namig { font-size:12px; color:var(--siva); margin-top:6px; }
+  .namig.opozorilo { color:var(--napaka); }
   .skrito { display:none !important; }
   .razdelek { border-top:1px solid var(--crta); padding-top:6px; margin-top:22px; }
   .stolpec { display:flex; flex-direction:column; gap:10px; }
@@ -163,16 +176,25 @@
     <h1 id="prijava-naslov"></h1>
     <div class="podnaslov" id="prijava-pod"></div>
     <div class="sporocilo" id="prijava-sporocilo"></div>
+    <div class="socialno">
+      <button class="soc apple" id="b-apple" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.7-3.18-1.73-1.35-.14-2.64.8-3.33.8-.69 0-1.74-.78-2.86-.76-1.47.02-2.83.86-3.59 2.17-1.53 2.65-.39 6.58 1.1 8.73.73 1.05 1.6 2.23 2.73 2.19 1.1-.04 1.51-.71 2.84-.71 1.32 0 1.7.71 2.86.69 1.18-.02 1.93-1.07 2.65-2.13.84-1.22 1.18-2.4 1.2-2.46-.03-.01-2.3-.88-2.3-3.49zM14.2 6.13c.6-.73 1.01-1.75.9-2.76-.87.04-1.92.58-2.54 1.31-.56.65-1.05 1.69-.92 2.69.97.07 1.96-.49 2.56-1.24z"/></svg><span data-t="zApple"></span></button>
+      <button class="soc google" id="b-google" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.79-.07-1.54-.2-2.27H12v4.3h6.46a5.52 5.52 0 0 1-2.4 3.62v3h3.88c2.27-2.09 3.56-5.17 3.56-8.65z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.9l-3.88-3c-1.08.72-2.45 1.15-4.06 1.15-3.12 0-5.77-2.11-6.71-4.95H1.28v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.29 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.28a12 12 0 0 0 0 10.8l4.01-3.1z"/><path fill="#EA4335" d="M12 4.75c1.76 0 3.34.61 4.59 1.8l3.44-3.44A11.5 11.5 0 0 0 12 0 12 12 0 0 0 1.28 6.6l4.01 3.1C6.23 6.86 8.88 4.75 12 4.75z"/></svg><span data-t="zGoogle"></span></button>
+    </div>
+    <div class="ali" data-t="aliEposta"></div>
     <form id="f-prijava" novalidate>
       <label for="email" data-t="eposta"></label>
       <input id="email" type="email" autocomplete="email" inputmode="email" required>
       <label for="geslo" data-t="geslo"></label>
-      <input id="geslo" type="password" autocomplete="current-password" minlength="8" required>
+      <div class="geslo-ovoj">
+        <input id="geslo" type="password" autocomplete="current-password" minlength="8" required>
+        <button class="oko" id="b-oko" type="button" data-t-aria="pokaziGeslo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 12S5.5 5 12 5s10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      </div>
+      <div class="namig" id="geslo-namig"></div>
+      <button class="povezava les" id="b-pozabljeno" type="button" data-t="pozabljeno" style="text-align:right; padding-top:6px"></button>
       <label class="potrditev" id="vrsta-ostani"><input type="checkbox" id="ostani" checked><span data-t="ostani"></span></label>
       <button class="gl" id="b-prijava" type="submit"></button>
     </form>
     <button class="povezava" id="b-preklopi"></button>
-    <button class="povezava les" id="b-pozabljeno" data-t="pozabljeno"></button>
     <div class="noga"><span data-t="euPodatki"></span><br><a href="zasebnost.html" data-t="zasebnost"></a></div>
   </section>
 
@@ -307,6 +329,8 @@
     sl: {
       ustvari: 'Ustvari račun', zePrijava: 'Že imate račun? <b>Prijava</b>', zasebnost: 'Politika zasebnosti', nazaj: 'Nazaj',
       prijava: 'Prijava', prijavaPod: 'Dobrodošli nazaj', registracijaPod: 'Postanite član Stajl Home',
+      zApple: 'Nadaljuj z Apple', zGoogle: 'Nadaljuj z Google', aliEposta: 'ali z e-pošto', pokaziGeslo: 'Pokaži geslo',
+      gesloNamig: 'Vsaj 8 znakov.', capsLock: 'Caps Lock je vklopljen.', eSocial: 'Prijava s tem računom še ni na voljo. Uporabite e-pošto.',
       eposta: 'E-pošta', geslo: 'Geslo', ostani: 'Ostani prijavljen', pozabljeno: 'Pozabljeno geslo',
       nimateRacuna: 'Nimate računa? <b>Ustvari račun</b>', euPodatki: 'Podatki so shranjeni v EU. Zgodovina uporabe luči se ne hrani.',
       novoGeslo: 'Novo geslo', novoGesloPod: 'Vpišite novo geslo (vsaj 8 znakov).', shraniGeslo: 'Shrani geslo',
@@ -344,6 +368,8 @@
     en: {
       ustvari: 'Create account', zePrijava: 'Already have an account? <b>Sign in</b>', zasebnost: 'Privacy policy', nazaj: 'Back',
       prijava: 'Sign in', prijavaPod: 'Welcome back', registracijaPod: 'Become a Stajl Home member',
+      zApple: 'Continue with Apple', zGoogle: 'Continue with Google', aliEposta: 'or with email', pokaziGeslo: 'Show password',
+      gesloNamig: 'At least 8 characters.', capsLock: 'Caps Lock is on.', eSocial: 'Signing in with this account is not available yet. Please use email.',
       eposta: 'Email', geslo: 'Password', ostani: 'Stay signed in', pozabljeno: 'Forgot password',
       nimateRacuna: 'No account yet? <b>Create account</b>', euPodatki: 'Data is stored in the EU. No history of light usage is kept.',
       novoGeslo: 'New password', novoGesloPod: 'Enter a new password (at least 8 characters).', shraniGeslo: 'Save password',
@@ -483,6 +509,7 @@
     $('b-preklopi').innerHTML = reg ? t('zePrijava') : t('nimateRacuna');
     $('geslo').autocomplete = reg ? 'new-password' : 'current-password';
     $('b-pozabljeno').classList.toggle('skrito', reg);
+    $('geslo-namig').textContent = reg ? t('gesloNamig') : ''; $('geslo-namig').classList.remove('opozorilo');
     if (!obdrziSporocilo) sporoci('prijava-sporocilo', '');
   }
   $('b-preklopi').onclick = () => nastaviNacin(!registracija);
@@ -490,13 +517,27 @@
   $('b-zacni-prijava').onclick = () => { nastaviNacin(false); pokazi('v-prijava'); };
   $('b-nazaj-dobro').onclick = () => pokazi('v-dobro');
   $('ostani').checked = ostaniPrijavljen();
+  try { const z = localStorage.getItem('stajl_email'); if (z) $('email').value = z; } catch (_) {}
+  $('b-oko').onclick = () => { const g = $('geslo'); g.type = g.type === 'password' ? 'text' : 'password'; };
+  $('geslo').addEventListener('keyup', (e) => {
+    const caps = e.getModifierState && e.getModifierState('CapsLock');
+    $('geslo-namig').textContent = caps ? t('capsLock') : (registracija ? t('gesloNamig') : '');
+    $('geslo-namig').classList.toggle('opozorilo', !!caps);
+  });
+  async function socialno(ponudnik) {
+    try { localStorage.setItem('stajl_ostani', $('ostani').checked ? '1' : '0'); } catch (_) {}
+    const { error } = await sb.auth.signInWithOAuth({ provider: ponudnik, options: { redirectTo: location.origin + location.pathname } });
+    if (error) sporoci('prijava-sporocilo', /not enabled|provider/i.test(error.message || '') ? t('eSocial') : prevedi(error), true);
+  }
+  $('b-apple').onclick = () => socialno('apple');
+  $('b-google').onclick = () => socialno('google');
 
   $('f-prijava').onsubmit = async (e) => {
     e.preventDefault();
     const email = $('email').value.trim(), geslo = $('geslo').value;
     if (!/^\S+@\S+\.\S+$/.test(email)) return sporoci('prijava-sporocilo', t('eNapacna'), true);
     if (geslo.length < 8) return sporoci('prijava-sporocilo', t('eGeslo'), true);
-    try { localStorage.setItem('stajl_ostani', $('ostani').checked ? '1' : '0'); } catch (_) {}
+    try { localStorage.setItem('stajl_ostani', $('ostani').checked ? '1' : '0'); localStorage.setItem('stajl_email', email); } catch (_) {}
     $('b-prijava').disabled = true;
     try {
       if (registracija) {
