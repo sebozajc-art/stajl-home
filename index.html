@@ -415,6 +415,15 @@
     setItem: (k, v) => { try { (ostaniPrijavljen() ? localStorage : sessionStorage).setItem(k, v); } catch (_) {} },
     removeItem: k => { try { localStorage.removeItem(k); sessionStorage.removeItem(k); } catch (_) {} }
   };
+  if (!window.supabase || !window.supabase.createClient) {
+    document.getElementById('v-dobro').classList.remove('skrito');
+    ['b-zacni-reg', 'b-zacni-prijava'].forEach(id => document.getElementById(id).style.display = 'none');
+    const m = document.getElementById('dobro-sporocilo');
+    m.textContent = jezik === 'sl' ? 'Brskalnik je zastarel ali ni povezave z internetom. Posodobite Google Chrome (Trgovina Play) in poskusite znova.'
+                                   : 'Your browser is outdated or offline. Please update Google Chrome and try again.';
+    m.className = 'sporocilo napaka vidno';
+    return;
+  }
   const sb = window.supabase.createClient('https://teankeafsfqtggflhiyy.supabase.co', 'sb_publishable_LCD22P1YKPg0Qh2TrnBSCA_rqZ2BfJS',
     { auth: { storage: shramba, persistSession: true, autoRefreshToken: true } });
 
@@ -932,6 +941,7 @@
       }
     }, 0);
   });
+  setTimeout(() => { if (!trenutniPogled) { nastaviNacin(false); pokazi('v-dobro'); } }, 6000);
   if ('serviceWorker' in navigator) { try { navigator.serviceWorker.register('sw.js'); } catch (_) {} }
 })();
 </script>
