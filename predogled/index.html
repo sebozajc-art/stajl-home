@@ -190,6 +190,7 @@
   .odstevanje { font-size:12px; color:var(--siva); text-align:center; margin-top:8px; letter-spacing:.06em; }
   .odstevanje.poteklo { color:var(--napaka); }
   #b-nova-koda:disabled { color:var(--siva); opacity:.8; cursor:default; }
+  #cipi-luc, #scena-predlogi, .izhod .cipi { display:none !important; }
   .skrito { display:none !important; }
   .razdelek { border-top:1px solid var(--crta); padding-top:6px; margin-top:22px; }
   .stolpec { display:flex; flex-direction:column; gap:10px; }
@@ -307,14 +308,19 @@
       <input id="email-obnova" type="email" autocomplete="email" inputmode="email">
       <button class="gl" type="submit" id="b-poslji-kodo" data-t="posljiKodo"></button>
     </form>
-    <form id="f-novogeslo" class="skrito" novalidate>
+    <form id="f-koda" class="skrito" novalidate>
       <label for="koda-obnova" data-t="kodaIzMaila"></label>
       <input id="koda-obnova" class="koda-vnos" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="••••••">
       <div class="odstevanje" id="odstevanje"></div>
+      <button class="gl" type="submit" id="b-preveri-kodo" data-t="potrdiKodo"></button>
+      <button class="povezava les" type="button" id="b-nova-koda" data-t="posljiNovoKodo" style="margin-top:14px"></button>
+    </form>
+    <form id="f-novogeslo" class="skrito" novalidate>
       <label for="geslo2" data-t="novoGesloPolje"></label>
       <input id="geslo2" type="password" autocomplete="new-password" minlength="8" required>
+      <label for="geslo3" data-t="ponoviGeslo"></label>
+      <input id="geslo3" type="password" autocomplete="new-password" minlength="8" required>
       <button class="gl" type="submit" id="b-shrani-geslo" data-t="shraniGeslo"></button>
-      <button class="povezava les" type="button" id="b-nova-koda" data-t="posljiNovoKodo" style="margin-top:14px"></button>
     </form>
     <button class="povezava" type="button" id="b-nazaj-prijava" data-t="nazajNaPrijavo" style="margin-top:18px"></button>
   </section>
@@ -455,7 +461,7 @@
       gesloNamig: 'Vsaj 8 znakov.', capsLock: 'Caps Lock je vklopljen.', eSocial: 'Prijava s tem računom še ni na voljo. Uporabite e-pošto.',
       eposta: 'E-pošta', geslo: 'Geslo', ostani: 'Ostani prijavljen', pozabljeno: 'Pozabljeno geslo',
       nimateRacuna: 'Nimate računa? <b>Ustvari račun</b>', euPodatki: 'Podatki so shranjeni v EU. Zgodovina uporabe luči se ne hrani.',
-      novoGeslo: 'Novo geslo', novoGesloPod: 'Vpišite novo geslo (vsaj 8 znakov).', shraniGeslo: 'Shrani geslo', obnovaKorak1: 'Vpišite e-pošto računa. Poslali vam bomo kodo za novo geslo.', obnovaKorak2: 'Kodo smo poslali na {email}. Vpišite jo in izberite novo geslo.', posljiKodo: 'Pošlji kodo', kodaIzMaila: 'Koda iz e-pošte', novoGesloPolje: 'Novo geslo (vsaj 8 znakov)', posljiNovoKodo: 'Pošlji novo kodo', posljiZnova: 'Ponovno pošiljanje čez {s} s', nazajNaPrijavo: '← Nazaj na prijavo', velja: 'Koda velja še {cas}', kodaPotekla: 'Koda je potekla. Pošljite novo kodo.', eKodaObnove: 'Koda ni pravilna ali je potekla.', ePosiljanje: 'E-pošte trenutno ni bilo mogoče poslati. Poskusite znova čez nekaj minut.', gesloSpremenjeno: 'Geslo je spremenjeno.',
+      novoGeslo: 'Novo geslo', novoGesloPod: 'Vpišite novo geslo (vsaj 8 znakov).', shraniGeslo: 'Shrani geslo', obnovaKorak1: 'Vpišite e-pošto računa. Poslali vam bomo kodo za novo geslo.', obnovaKorak2: 'Kodo smo poslali na {email}. Vpišite jo in izberite novo geslo.', posljiKodo: 'Pošlji kodo', kodaIzMaila: 'Koda iz e-pošte', novoGesloPolje: 'Novo geslo (vsaj 8 znakov)', posljiNovoKodo: 'Pošlji novo kodo', potrdiKodo: 'Potrdi kodo', ponoviGeslo: 'Ponovite novo geslo', eGeslaRazlicna: 'Gesli se ne ujemata.', obnovaKorak3: 'Koda je potrjena. Vpišite novo geslo.', posljiZnova: 'Ponovno pošiljanje čez {s} s', nazajNaPrijavo: '← Nazaj na prijavo', velja: 'Koda velja še {cas}', kodaPotekla: 'Koda je potekla. Pošljite novo kodo.', eKodaObnove: 'Koda ni pravilna ali je potekla.', ePosiljanje: 'E-pošte trenutno ni bilo mogoče poslati. Poskusite znova čez nekaj minut.', gesloSpremenjeno: 'Geslo je spremenjeno.',
       naprave: 'Naprave', nastavitve: 'Nastavitve', mojiDomovi: 'Moji domovi', privzetiDom: 'Stajl Home', novDom: '+ Nov dom', novDomIme: 'Nov dom', preimenuj: 'Preimenuj', izbrisiDom: 'Izbriši', shraniKratko: 'Shrani', zapri: 'Zapri', eDomZadnji: 'Vsaj en dom mora ostati.', eDomIme: 'Vpišite ime doma.', zeObstaja: 'Račun s tem e-naslovom že obstaja. Prijavite se ali izberite »Pozabljeno geslo«.', imeInPriimek: 'Ime in priimek', imeShranjeno: 'Ime je shranjeno.', domovi: 'Domovi', demo: 'Preizkusi Demo kuhinjo',
       dodajLuc: 'Dodaj luč ali kuhinjo', kodaNalepke: 'Koda z nalepke', kodaPrimer: 'npr. A1B2C3D4', dodaj: 'Dodaj',
       skenirajNasvet: 'Ali pa QR kodo na nalepki skenirajte s kamero telefona.',
@@ -500,7 +506,7 @@
       gesloNamig: 'At least 8 characters.', capsLock: 'Caps Lock is on.', eSocial: 'Signing in with this account is not available yet. Please use email.',
       eposta: 'Email', geslo: 'Password', ostani: 'Stay signed in', pozabljeno: 'Forgot password',
       nimateRacuna: 'No account yet? <b>Create account</b>', euPodatki: 'Data is stored in the EU. No history of light usage is kept.',
-      novoGeslo: 'New password', novoGesloPod: 'Enter a new password (at least 8 characters).', shraniGeslo: 'Save password', obnovaKorak1: 'Enter your account email. We will send you a code for a new password.', obnovaKorak2: 'We sent a code to {email}. Enter it and choose a new password.', posljiKodo: 'Send code', kodaIzMaila: 'Code from email', novoGesloPolje: 'New password (at least 8 characters)', posljiNovoKodo: 'Send a new code', posljiZnova: 'Resend in {s} s', nazajNaPrijavo: '← Back to sign in', velja: 'Code valid for {cas}', kodaPotekla: 'The code has expired. Send a new one.', eKodaObnove: 'The code is wrong or has expired.', ePosiljanje: 'The email could not be sent right now. Please try again in a few minutes.', gesloSpremenjeno: 'Password changed.',
+      novoGeslo: 'New password', novoGesloPod: 'Enter a new password (at least 8 characters).', shraniGeslo: 'Save password', obnovaKorak1: 'Enter your account email. We will send you a code for a new password.', obnovaKorak2: 'We sent a code to {email}. Enter it and choose a new password.', posljiKodo: 'Send code', kodaIzMaila: 'Code from email', novoGesloPolje: 'New password (at least 8 characters)', posljiNovoKodo: 'Send a new code', potrdiKodo: 'Confirm code', ponoviGeslo: 'Repeat new password', eGeslaRazlicna: 'The passwords do not match.', obnovaKorak3: 'Code confirmed. Enter a new password.', posljiZnova: 'Resend in {s} s', nazajNaPrijavo: '← Back to sign in', velja: 'Code valid for {cas}', kodaPotekla: 'The code has expired. Send a new one.', eKodaObnove: 'The code is wrong or has expired.', ePosiljanje: 'The email could not be sent right now. Please try again in a few minutes.', gesloSpremenjeno: 'Password changed.',
       naprave: 'Devices', nastavitve: 'Settings', mojiDomovi: 'My homes', privzetiDom: 'Stajl Home', novDom: '+ New home', novDomIme: 'New home', preimenuj: 'Rename', izbrisiDom: 'Delete', shraniKratko: 'Save', zapri: 'Close', eDomZadnji: 'At least one home must remain.', eDomIme: 'Enter a home name.', zeObstaja: 'An account with this email already exists. Sign in or choose “Forgot password”.', imeInPriimek: 'Full name', imeShranjeno: 'Name saved.', domovi: 'Homes', demo: 'Try the demo kitchen',
       dodajLuc: 'Add a light or kitchen', kodaNalepke: 'Code from the sticker', kodaPrimer: 'e.g. A1B2C3D4', dodaj: 'Add',
       skenirajNasvet: 'Or scan the QR code on the sticker with your phone camera.',
@@ -725,16 +731,17 @@
   }
   function korakObnove(k) {
     $('f-poslji-kodo').classList.toggle('skrito', k !== 1);
-    $('f-novogeslo').classList.toggle('skrito', k !== 2);
-    $('novogeslo-pod').textContent = k === 1 ? t('obnovaKorak1') : t('obnovaKorak2', { email: obnovaEmail });
+    $('f-koda').classList.toggle('skrito', k !== 2);
+    $('f-novogeslo').classList.toggle('skrito', k !== 3);
+    $('novogeslo-pod').textContent = k === 1 ? t('obnovaKorak1') : k === 2 ? t('obnovaKorak2', { email: obnovaEmail }) : t('obnovaKorak3');
   }
   function zazeniOdstevanje() {
     clearInterval(odstevalnik);
     const konec = Date.now() + VELJAVNOST_KODE * 1000;
-    const el = $('odstevanje'); $('b-shrani-geslo').disabled = false;
+    const el = $('odstevanje'); $('b-preveri-kodo').disabled = false;
     const tik = () => {
       const ost = Math.max(0, Math.round((konec - Date.now()) / 1000));
-      if (!ost) { clearInterval(odstevalnik); el.textContent = t('kodaPotekla'); el.classList.add('poteklo'); $('b-shrani-geslo').disabled = true; return; }
+      if (!ost) { clearInterval(odstevalnik); el.textContent = t('kodaPotekla'); el.classList.add('poteklo'); $('b-preveri-kodo').disabled = true; return; }
       el.classList.remove('poteklo'); el.textContent = t('velja', { cas: Math.floor(ost / 60) + ':' + String(ost % 60).padStart(2, '0') });
     };
     tik(); odstevalnik = setInterval(tik, 1000);
@@ -763,32 +770,34 @@
     posljiKodoObnove();
   };
   $('b-nova-koda').onclick = () => posljiKodoObnove();
-  $('b-nazaj-prijava').onclick = () => { clearInterval(odstevalnik); nastaviNacin(false); pokazi('v-prijava'); };
+  $('b-nazaj-prijava').onclick = async () => { clearInterval(odstevalnik); if (menjamGeslo) { menjamGeslo = false; await sb.auth.signOut(); } nastaviNacin(false); pokazi('v-prijava'); };
   $('koda-obnova').oninput = (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 8); };
+  $('f-koda').onsubmit = async (e) => {
+    e.preventDefault();
+    const koda = $('koda-obnova').value.trim();
+    if (koda.length < 6) return sporoci('novogeslo-sporocilo', t('eKodaObnove'), true);
+    $('b-preveri-kodo').disabled = true;
+    menjamGeslo = true;
+    const { error } = await sb.auth.verifyOtp({ email: obnovaEmail, token: koda, type: 'recovery' });
+    if (error) { menjamGeslo = false; $('b-preveri-kodo').disabled = false; return sporoci('novogeslo-sporocilo', prevedi(error), true); }
+    clearInterval(odstevalnik); clearInterval(zamikTimer);
+    sporoci('novogeslo-sporocilo', '');
+    korakObnove(3); setTimeout(() => $('geslo2').focus(), 60);
+  };
   $('f-novogeslo').onsubmit = async (e) => {
     e.preventDefault();
-    const koda = $('koda-obnova').value.trim(), g = $('geslo2').value;
-    if (koda.length < 6) return sporoci('novogeslo-sporocilo', t('eKodaObnove'), true);
+    const g = $('geslo2').value, g2 = $('geslo3').value;
     if (g.length < 8) return sporoci('novogeslo-sporocilo', t('eGeslo'), true);
+    if (g !== g2) return sporoci('novogeslo-sporocilo', t('eGeslaRazlicna'), true);
     $('b-shrani-geslo').disabled = true;
-    try {
-      if (obnovaEmail) {
-        menjamGeslo = true;
-        const { error } = await sb.auth.verifyOtp({ email: obnovaEmail, token: koda, type: 'recovery' });
-        if (error) throw error;
-      }
-      const { data, error } = await sb.auth.updateUser({ password: g });
-      if (error) throw error;
-      clearInterval(odstevalnik);
-      menjamGeslo = false;
-      if (data && data.user) uporabnik = data.user;
-      await pozdravi(uporabnik);
-      naloziDomove(t('gesloSpremenjeno'));
-    } catch (err) {
-      menjamGeslo = false;
-      sporoci('novogeslo-sporocilo', prevedi(err), true);
-      $('b-shrani-geslo').disabled = false;
-    }
+    const { data, error } = await sb.auth.updateUser({ password: g });
+    $('b-shrani-geslo').disabled = false;
+    if (error) return sporoci('novogeslo-sporocilo', prevedi(error), true);
+    menjamGeslo = false;
+    $('geslo2').value = ''; $('geslo3').value = '';
+    if (data && data.user) uporabnik = data.user;
+    await pozdravi(uporabnik);
+    naloziDomove(t('gesloSpremenjeno'));
   };
 
   // ---------- animacija dobrodošlice ----------
@@ -1378,7 +1387,7 @@
       const prej = uporabnik;
       uporabnik = seja ? seja.user : null;
       if (menjamGeslo) return;
-      if (dogodek === 'PASSWORD_RECOVERY' || (obnovaGesla && seja)) { obnovaGesla = false; obnovaEmail = ''; korakObnove(2); $('koda-obnova').closest('form').querySelectorAll('#koda-obnova, [for=koda-obnova], #odstevanje, #b-nova-koda').forEach(x => x.classList.add('skrito')); $('novogeslo-pod').textContent = t('novoGesloPod'); pokazi('v-novogeslo'); return; }
+      if (dogodek === 'PASSWORD_RECOVERY' || (obnovaGesla && seja)) { obnovaGesla = false; menjamGeslo = true; korakObnove(3); pokazi('v-novogeslo'); return; }
       if (!uporabnik) {
         trenutna = null;
         nastaviNacin(false); pokazi('v-dobro');
@@ -1387,7 +1396,7 @@
       }
       if (dogodek === 'SIGNED_IN' && prej && prej.id === uporabnik.id) return;
       if (dogodek === 'SIGNED_IN' || dogodek === 'INITIAL_SESSION') {
-        if (dogodek === 'SIGNED_IN') await pozdravi(uporabnik);
+        if (!menjamGeslo) await pozdravi(uporabnik);
         const k = vzemiKodo();
         if (k) { await obdelajKodo(k); } else if (!trenutna) { naloziDomove(); }
       }
