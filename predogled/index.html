@@ -189,6 +189,12 @@
   .moznost.glavna small { color:rgba(244,243,241,.7); }
   .kljuc-qr { width:220px; margin:18px auto 8px; background:#fff; padding:10px; border-radius:10px; }
   .kljuc-qr svg { width:100%; height:auto; display:block; }
+  body.gost #b-demo, body.gost #b-dodaj-napravo, body.gost #b-dodaj-luc, body.gost #b-uredi-prostor, body.gost #b-uredi-scene, body.gost .scena-cip.dodaj, body.gost .lastnik-del { display:none !important; }
+  .clan { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 0; border-bottom:1px solid var(--crta); }
+  .clan .im { font-size:15px; } .clan .st { font-size:12px; color:var(--siva); margin-top:2px; }
+  .clan .oz { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--siva); }
+  .predaja-vrsta { padding:12px 0; border-bottom:1px solid var(--crta); }
+  .predaja-vrsta .im { font-size:15px; } .predaja-vrsta .st { font-size:12px; color:var(--siva); margin-top:3px; }
   .kljuc-koda { text-align:center; font-size:30px; font-weight:300; letter-spacing:.25em; margin:14px 0 4px; }
   .mali-gumb { flex:none; font:inherit; font-size:12px; letter-spacing:.06em; padding:9px 16px; border-radius:999px; border:1px solid var(--crta); background:transparent; color:var(--tekst); cursor:pointer; }
   .dom-vrsta { display:flex; align-items:center; gap:8px; background:var(--plosca); border-radius:8px; padding:4px 6px 4px 16px; margin-top:6px; }
@@ -456,14 +462,14 @@
       <button class="povezava" id="b-preklici-urnik" data-t="preklici"></button>
     </div>
     <div class="noga" data-t="urnikNasvet"></div>
-    <div class="oznaka" data-t="imeLuciNaslov"></div>
+    <div class="oznaka lastnik-del" data-t="imeLuciNaslov"></div>
     <div class="sporocilo" id="luc-sporocilo"></div>
-    <div class="vrsta-vnos"><input id="ime-luci-uredi" maxlength="30"><button class="mali-gumb" id="b-shrani-ime-luci" type="button" data-t="shraniKratko"></button></div>
-    <div class="oznaka" data-t="ikona"></div>
-    <div id="luc-ikone"></div>
-    <div class="oznaka" data-t="premakni"></div>
-    <div class="cipi" id="luc-prostori"></div>
-    <button class="povezava" id="b-odstrani-luc" type="button" style="margin-top:22px"></button>
+    <div class="vrsta-vnos lastnik-del"><input id="ime-luci-uredi" maxlength="30"><button class="mali-gumb" id="b-shrani-ime-luci" type="button" data-t="shraniKratko"></button></div>
+    <div class="oznaka lastnik-del" data-t="ikona"></div>
+    <div id="luc-ikone" class="lastnik-del"></div>
+    <div class="oznaka lastnik-del" data-t="premakni"></div>
+    <div class="cipi lastnik-del" id="luc-prostori"></div>
+    <button class="povezava lastnik-del" id="b-odstrani-luc" type="button" style="margin-top:22px"></button>
   </section>
 
   <!-- NOVA LUČ -->
@@ -532,6 +538,8 @@
       <div class="noga" style="text-align:left; margin-top:10px" id="nfc-navodila" data-t="nfcNavodila"></div>
       <button class="povezava" id="b-nova-koda-kljuca" style="margin-top:18px" data-t="novaKodaKljuca"></button>
     </div>
+    <div class="oznaka" data-t="zgodovinaPredaj"></div>
+    <div id="seznam-predaj"></div>
   </section>
 
   <!-- NASTAVITVE -->
@@ -545,6 +553,17 @@
     <button class="sek" id="b-shrani-ime" style="margin-top:14px" data-t="shrani"></button>
     <div class="oznaka" data-t="jezikNaslov"></div>
     <div class="jezik" data-jezik style="font-size:14px"></div>
+    <div class="oznaka" data-t="deljenjeNaslov"></div>
+    <div class="noga" style="margin:0 0 6px; text-align:left" id="deljenje-pod"></div>
+    <div id="seznam-clanov"></div>
+    <div class="sporocilo" id="deljenje-sporocilo"></div>
+    <div id="povabilo" class="skrito">
+      <div class="kljuc-koda" id="povabilo-koda"></div>
+      <div class="noga" style="margin:4px 0 12px" data-t="povabiloVelja"></div>
+      <button class="gl" id="b-deli-povabilo" type="button" data-t="deliPovabilo"></button>
+    </div>
+    <button class="sek" id="b-povabi" style="margin-top:12px" type="button" data-t="povabi"></button>
+    <button class="sek skrito" id="b-zapusti-dom" style="margin-top:12px" type="button" data-t="zapustiDom"></button>
     <div class="oznaka skrito monter" data-t="predajaNaslov"></div>
     <button class="moznost skrito monter" id="b-odpri-predajo" type="button"><span class="ik"></span><span><b data-t="predajaGumb"></b><small data-t="predajaGumbPod"></small></span></button>
     <div class="oznaka" data-t="napraveNaslov"></div>
@@ -580,12 +599,18 @@
       dodajNapravo: '+ Dodaj', dodajNapravoNaslov: 'Skeniraj kodo', dodajNapravoPod: 'Ključ doma, nalepka luči ali naprave Stajl – vse deluje.', skenirajQR: 'Skeniraj QR kodo', skenirajQRPod: 'Odpre se kamera', vpisiRocno: 'Vpiši kodo ročno', vpisiRocnoPod: 'Koda z nalepke, npr. A1B2C3D4', usmeriKamero: 'Usmerite kamero v QR kodo na nalepki', eKamera: 'Kamere ni bilo mogoče odpreti. Dovolite dostop do kamere ali vpišite kodo ročno.', eQR: 'To ni koda Stajl Home.', odDo: 'Od–do', do: 'Do', okno: '{od}–{do}',
       zApple: 'Nadaljuj z Apple', zGoogle: 'Nadaljuj z Google', aliEposta: 'ali z e-pošto', pokaziGeslo: 'Pokaži geslo',
       gesloNamig: 'Vsaj 8 znakov.', capsLock: 'Caps Lock je vklopljen.', eSocial: 'Prijava s tem računom še ni na voljo. Uporabite e-pošto.',
+      deljenjeNaslov: 'Deljenje doma', deljenjePod: 'Kdo upravlja luči v domu »{dom}«.', deljenoZVami: 'Ta dom je deljen z vami. Luči, scene in urnike lahko uporabljate, prostore pa ureja lastnik.',
+      povabi: 'Povabi družinskega člana', povabiloVelja: 'Koda velja 48 ur. Član jo vpiše v aplikaciji pod Dodaj › Vpiši kodo.', deliPovabilo: 'Pošlji povabilo',
+      povabiloBesedilo: 'Povabilo v dom »{dom}« v aplikaciji Stajl Home. Koda: {koda}', zapustiDom: 'Zapusti ta dom', resZapusti: 'Res zapustim? Tapnite še enkrat.',
+      zapustil: 'Dom ste zapustili.', pridruzen: 'Dobrodošli. Dom je zdaj deljen z vami.', lastnik: 'Lastnik', odstrani: 'Odstrani', resOdstrani: 'Res?', deljen: 'deljen',
+      ePovabilo: 'Povabilo ni več veljavno. Prosite za novo kodo.', kopiranoPovabilo: 'Povabilo je kopirano.',
+      zgodovinaPredaj: 'Zgodovina predaj', niPredaj: 'Ni še predaj.', predano: 'Predano', pripravljeno: 'Pripravljeno, čaka na prevzem', kodaKratko: 'koda',
       eposta: 'E-pošta', geslo: 'Geslo', ostani: 'Ostani prijavljen', pozabljeno: 'Pozabljeno geslo',
       nimateRacuna: 'Nimate računa? <b>Ustvari račun</b>', euPodatki: 'Podatki so shranjeni v EU. Zgodovina uporabe luči se ne hrani.',
       novoGeslo: 'Novo geslo', novoGesloPod: 'Vpišite novo geslo (vsaj 8 znakov).', shraniGeslo: 'Shrani geslo', obnovaKorak1: 'Vpišite e-pošto računa. Poslali vam bomo kodo za novo geslo.', obnovaKorak2: 'Kodo smo poslali na {email}. Vpišite jo in izberite novo geslo.', posljiKodo: 'Pošlji kodo', kodaIzMaila: 'Koda iz e-pošte', novoGesloPolje: 'Novo geslo (vsaj 8 znakov)', posljiNovoKodo: 'Pošlji novo kodo', potrdiKodo: 'Potrdi kodo', ponoviGeslo: 'Ponovite novo geslo', eGeslaRazlicna: 'Gesli se ne ujemata.', obnovaKorak3: 'Koda je potrjena. Vpišite novo geslo.', posljiZnova: 'Ponovno pošiljanje čez {s} s', nazajNaPrijavo: '← Nazaj na prijavo', velja: 'Koda velja še {cas}', kodaPotekla: 'Koda je potekla. Pošljite novo kodo.', eKodaObnove: 'Koda ni pravilna ali je potekla.', ePosiljanje: 'E-pošte trenutno ni bilo mogoče poslati. Poskusite znova čez nekaj minut.', gesloSpremenjeno: 'Geslo je spremenjeno.',
       naprave: 'Naprave', prostori: 'Prostori', prostor: 'Prostor',
       zacetekPod: 'Če ste stanovanje opremili pri Mizarstvu Stajl, ste ob predaji dobili ključ doma.', zacKljuc: 'Prisloni ključ ali vpiši kodo', zacKljucPod: 'Vaš dom z lučmi in scenami se pripravi sam', kljucPrislonite: 'Ključ prislonite na hrbet telefona ali vpišite kodo s kartice.', kodaKljuca: 'Koda ključa', zapisiNfc: 'Zapiši na ključ (NFC)', nfcPrislonite: 'Ključ prislonite na hrbet telefona …', nfcZapisano: 'Zapisano. Ključ je pripravljen.', nfcNapaka: 'Zapis ni uspel. Poskusite znova ali uporabite NFC Tools.', nfcNavodila: 'Na iPhonu: kopirajte povezavo in jo v aplikaciji NFC Tools zapišite na čip (Write → Add a record → URL). Kodo natisnite na kartico, če kdaj NFC ne deluje.', zacNov: 'Ustvari nov dom', zacNovPod: 'Prostore in luči dodate sami',
-      domPrevzet: 'Dobrodošli doma. Vse je pripravljeno.', predajaNaslov: 'Predaja', predajaGumb: 'Predaja stranki', predajaGumbPod: 'Ključ doma za trenutni dom',
+      domPrevzet: 'Dobrodošli doma. Vse je pripravljeno.', predajaNaslov: 'Predaja', predajaGumb: 'Predaja stranki', predajaGumbPod: 'Ključ doma in zgodovina predaj',
       predajaRazlaga: 'Ko so vse luči poimenovane in razporejene po prostorih, pripravite ključ. Če scen še ni, se samodejno ustvarijo Večer, Jutro in Noč. Ko stranka prisloni ključ, se ji cel dom prenese na njen račun, vaš dostop pa se zaključi.',
       pripraviPredajo: 'Pripravi ključ', kljucNasvet: 'Ključ s to kodo velja enkrat – za prevzem doma. Kodo natisnite na kartico dobrodošlice.', prenesiSvg: 'Prenesi QR za gravuro (SVG)', kopirajPovezavo: 'Kopiraj povezavo za NFC', kopirano: 'Povezava je kopirana.', novaKodaKljuca: 'Ključ je izgubljen – nova koda', kodaZamenjana: 'Stara koda ne deluje več. Naredite nov ključ.',
       scVecer: 'Večer', scJutro: 'Jutro', scNoc: 'Noč', ikona: 'Ikona', urediProstor: 'Uredi prostor', imeInIkona: 'Ime in ikona', imeInIkonaPod: 'Preimenujte prostor ali izberite drugo ikono', izbrisiProstorPod: 'Luči ostanejo v napravi, iz prostora se odstranijo', katKuhinja: 'Kuhinja', katDnevna: 'Dnevna in jedilnica', katSpalnica: 'Spalnica', katKopalnica: 'Kopalnica', katSplosno: 'Splošno', uredi: 'Uredi', koncano: 'Končano', vseUgasni: 'Vse ugasni', scena: 'Scena',
@@ -634,12 +659,18 @@
       dodajNapravo: '+ Add', dodajNapravoNaslov: 'Scan code', dodajNapravoPod: 'Home key, light or device sticker – all work.', skenirajQR: 'Scan QR code', skenirajQRPod: 'Opens the camera', vpisiRocno: 'Enter code manually', vpisiRocnoPod: 'Code from the sticker, e.g. A1B2C3D4', usmeriKamero: 'Point the camera at the QR code on the sticker', eKamera: 'Could not open the camera. Allow camera access or enter the code manually.', eQR: 'This is not a Stajl Home code.', odDo: 'From–to', do: 'Until', okno: '{od}–{do}',
       zApple: 'Continue with Apple', zGoogle: 'Continue with Google', aliEposta: 'or with email', pokaziGeslo: 'Show password',
       gesloNamig: 'At least 8 characters.', capsLock: 'Caps Lock is on.', eSocial: 'Signing in with this account is not available yet. Please use email.',
+      deljenjeNaslov: 'Sharing', deljenjePod: 'Who controls the lights in »{dom}«.', deljenoZVami: 'This home is shared with you. You can use lights, scenes and schedules; the owner edits the rooms.',
+      povabi: 'Invite a family member', povabiloVelja: 'The code is valid for 48 hours. They enter it in the app under Add › Enter code.', deliPovabilo: 'Send invitation',
+      povabiloBesedilo: 'Invitation to the home »{dom}« in Stajl Home. Code: {koda}', zapustiDom: 'Leave this home', resZapusti: 'Leave for sure? Tap again.',
+      zapustil: 'You left the home.', pridruzen: 'Welcome. This home is now shared with you.', lastnik: 'Owner', odstrani: 'Remove', resOdstrani: 'Sure?', deljen: 'shared',
+      ePovabilo: 'The invitation is no longer valid. Ask for a new code.', kopiranoPovabilo: 'Invitation copied.',
+      zgodovinaPredaj: 'Handover history', niPredaj: 'No handovers yet.', predano: 'Handed over', pripravljeno: 'Prepared, waiting for the client', kodaKratko: 'code',
       eposta: 'Email', geslo: 'Password', ostani: 'Stay signed in', pozabljeno: 'Forgot password',
       nimateRacuna: 'No account yet? <b>Create account</b>', euPodatki: 'Data is stored in the EU. No history of light usage is kept.',
       novoGeslo: 'New password', novoGesloPod: 'Enter a new password (at least 8 characters).', shraniGeslo: 'Save password', obnovaKorak1: 'Enter your account email. We will send you a code for a new password.', obnovaKorak2: 'We sent a code to {email}. Enter it and choose a new password.', posljiKodo: 'Send code', kodaIzMaila: 'Code from email', novoGesloPolje: 'New password (at least 8 characters)', posljiNovoKodo: 'Send a new code', potrdiKodo: 'Confirm code', ponoviGeslo: 'Repeat new password', eGeslaRazlicna: 'The passwords do not match.', obnovaKorak3: 'Code confirmed. Enter a new password.', posljiZnova: 'Resend in {s} s', nazajNaPrijavo: '← Back to sign in', velja: 'Code valid for {cas}', kodaPotekla: 'The code has expired. Send a new one.', eKodaObnove: 'The code is wrong or has expired.', ePosiljanje: 'The email could not be sent right now. Please try again in a few minutes.', gesloSpremenjeno: 'Password changed.',
       naprave: 'Devices', prostori: 'Rooms', prostor: 'Room',
       zacetekPod: 'If Mizarstvo Stajl furnished your home, you received a home key at handover.', zacKljuc: 'Tap your key or enter the code', zacKljucPod: 'Your home with lights and scenes sets itself up', kljucPrislonite: 'Hold the key to the back of your phone or enter the code from the card.', kodaKljuca: 'Key code', zapisiNfc: 'Write to key (NFC)', nfcPrislonite: 'Hold the key to the back of the phone …', nfcZapisano: 'Written. The key is ready.', nfcNapaka: 'Writing failed. Try again or use NFC Tools.', nfcNavodila: 'On iPhone: copy the link and write it to the chip with the NFC Tools app (Write → Add a record → URL). Print the code on the card in case NFC ever fails.', zacNov: 'Create a new home', zacNovPod: 'Add rooms and lights yourself',
-      domPrevzet: 'Welcome home. Everything is ready.', predajaNaslov: 'Handover', predajaGumb: 'Hand over to client', predajaGumbPod: 'Home key for the current home',
+      domPrevzet: 'Welcome home. Everything is ready.', predajaNaslov: 'Handover', predajaGumb: 'Hand over to client', predajaGumbPod: 'Home key and handover history',
       predajaRazlaga: 'Once all lights are named and placed in rooms, prepare the key. If there are no scenes yet, Evening, Morning and Night are created automatically. When the client taps the key, the whole home moves to their account and your access ends.',
       pripraviPredajo: 'Prepare key', kljucNasvet: 'A key with this code works once – to take over the home. Print the code on the welcome card.', prenesiSvg: 'Download QR for engraving (SVG)', kopirajPovezavo: 'Copy link for NFC', kopirano: 'Link copied.', novaKodaKljuca: 'Key lost – new code', kodaZamenjana: 'The old code no longer works. Make a new key.',
       scVecer: 'Evening', scJutro: 'Morning', scNoc: 'Night', ikona: 'Icon', urediProstor: 'Edit room', imeInIkona: 'Name and icon', imeInIkonaPod: 'Rename the room or choose another icon', izbrisiProstorPod: 'Lights stay on the device and are removed from this room', katKuhinja: 'Kitchen', katDnevna: 'Living and dining', katSpalnica: 'Bedroom', katKopalnica: 'Bathroom', katSplosno: 'General', uredi: 'Edit', koncano: 'Done', vseUgasni: 'All off', scena: 'Scene',
@@ -877,6 +908,16 @@
     const { error } = await sb.auth.signInWithOAuth({ provider: ponudnik, options: { redirectTo: location.origin + location.pathname } });
     if (error) sporoci('prijava-sporocilo', /not enabled|provider/i.test(error.message || '') ? t('eSocial') : prevedi(error), true);
   }
+  (async () => {
+    try {
+      const r = await fetch('https://teankeafsfqtggflhiyy.supabase.co/auth/v1/settings', { headers: { apikey: 'sb_publishable_LCD22P1YKPg0Qh2TrnBSCA_rqZ2BfJS' } });
+      const ext = ((await r.json()) || {}).external || {};
+      $('b-apple').classList.toggle('skrito', !ext.apple);
+      $('b-google').classList.toggle('skrito', !ext.google);
+      const kaj = !!(ext.apple || ext.google);
+      $('socialno').classList.toggle('skrito', !kaj); $('ali-eposta').classList.toggle('skrito', !kaj);
+    } catch (_) {}
+  })();
   $('b-apple').onclick = () => socialno('apple');
   $('b-google').onclick = () => socialno('google');
 
@@ -1016,9 +1057,9 @@
   let domoviObljuba = null;
   function naloziSeznamDomov() { if (!domoviObljuba) domoviObljuba = _naloziSeznamDomov().finally(() => { domoviObljuba = null; }); return domoviObljuba; }
   async function _naloziSeznamDomov() {
-    let { data } = await sb.from('domovi').select('id,ime').order('created_at');
+    let { data } = await sb.from('domovi').select('id,ime,user_id').order('created_at');
     if (!data || !data.length) {
-      const r = await sb.from('domovi').insert({ ime: t('privzetiDom') }).select('id,ime');
+      const r = await sb.from('domovi').insert({ ime: t('privzetiDom') }).select('id,ime,user_id');
       data = r.data || [];
     }
     domovi = data;
@@ -1039,6 +1080,8 @@
   function stanje(k) { const l = luci[k] || lociKljuc(k); return stanjeLuci(l.dev, l.ch); }
   function imeLuci(dev, ch) { const d = naprave[dev]; return d ? imeKanala(d, ch).ime : t('privzeto')[ch]; }
   function luciProstora(pid) { return razpored.filter(r => r.prostor_id === pid); }
+  function jeGost(id) { const d = domovi.find(x => x.id === (id || trenutniDom)); return !!(d && uporabnik && d.user_id && d.user_id !== uporabnik.id); }
+  function lastniDomovi() { return domovi.filter(d => !jeGost(d.id)); }
   function luciDoma() { const ids = new Set(prostori.map(p => p.id)); return razpored.filter(r => ids.has(r.prostor_id)); }
   function gorijo(n) {
     if (jezik === 'en') return n === 1 ? t('gori1', { n }) : t('goriN', { n });
@@ -1105,6 +1148,7 @@
     await naloziSeznamDomov();
     const dom = domovi.find(d => d.id === trenutniDom);
     $('dom-ime').textContent = dom ? dom.ime : t('privzetiDom');
+    document.body.classList.toggle('gost', jeGost());
     try { await naloziPodatke(); }
     catch (err) { $('seznam-prostorov').innerHTML = `<div class="prazno">${esc(prevedi(err))}</div>`; return; }
     narisiDom();
@@ -1175,9 +1219,9 @@
     };
     if (!urejamScene) cip(t('vseUgasni'), 'ugasni', (e) => { blisk(e.currentTarget); poslji(luciDoma().map(r => ({ dev: r.device_id, ch: r.channel, on: false }))); });
     sceneDoma.forEach(s => {
-      const b = cip(s.ime, s.ikona || ikonaSceno(s.ime), (e) => { if (urejamScene) return odpriSceno(s); blisk(e.currentTarget); uporabiSceno(s); }, urejamScene ? 'uredi' : '');
+      const b = cip(s.ime, s.ikona || ikonaSceno(s.ime), (e) => { if (urejamScene && !jeGost()) return odpriSceno(s); blisk(e.currentTarget); uporabiSceno(s); }, urejamScene ? 'uredi' : '');
       let dolgo = null;
-      b.addEventListener('pointerdown', () => { dolgo = setTimeout(() => { dolgo = 'odprto'; odpriSceno(s); }, 600); });
+      b.addEventListener('pointerdown', () => { if (jeGost()) return; dolgo = setTimeout(() => { dolgo = 'odprto'; odpriSceno(s); }, 600); });
       ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => { if (dolgo !== 'odprto') clearTimeout(dolgo); }));
     });
     cip(t('scena'), 'plus', () => odpriSceno(null), 'dodaj');
@@ -1361,14 +1405,20 @@
         v.querySelector('.mali').onclick = shrani; inp.onkeydown = (e) => { if (e.key === 'Enter') shrani(); };
         el.appendChild(v); setTimeout(() => { inp.focus(); inp.select(); }, 30); return;
       }
-      v.innerHTML = `<button class="izb ${d.id === trenutniDom ? 'trenutni' : ''}" type="button"></button><button class="mali" type="button">${esc(t('preimenuj'))}</button>${domovi.length > 1 ? `<button class="mali brisi" type="button">${esc(t('izbrisiDom'))}</button>` : ''}`;
+      if (jeGost(d.id)) {
+        v.innerHTML = `<button class="izb ${d.id === trenutniDom ? 'trenutni' : ''}" type="button"></button><span class="mali">${esc(t('deljen'))}</span>`;
+        v.querySelector('.izb').textContent = d.ime;
+        v.querySelector('.izb').onclick = () => { shraniDom(d.id); zapriDomove(); naloziDomove(); };
+        el.appendChild(v); return;
+      }
+      v.innerHTML = `<button class="izb ${d.id === trenutniDom ? 'trenutni' : ''}" type="button"></button><button class="mali" type="button">${esc(t('preimenuj'))}</button>${lastniDomovi().length > 1 ? `<button class="mali brisi" type="button">${esc(t('izbrisiDom'))}</button>` : ''}`;
       v.querySelector('.izb').textContent = d.ime;
       v.querySelector('.izb').onclick = () => { shraniDom(d.id); zapriDomove(); naloziDomove(); };
       v.querySelector('.mali').onclick = () => narisiDomove(d.id);
       const b = v.querySelector('.brisi');
       if (b) b.onclick = async () => {
-        if (domovi.length < 2) return sporoci('domovi-sporocilo', t('eDomZadnji'), true);
-        const drug = domovi.find(x => x.id !== d.id);
+        if (lastniDomovi().length < 2) return sporoci('domovi-sporocilo', t('eDomZadnji'), true);
+        const drug = lastniDomovi().find(x => x.id !== d.id);
         const { data: cl } = await sb.from('device_members').select('device_id,dom_id');
         await Promise.all((cl || []).filter(c => c.dom_id === d.id).map(c => sb.rpc('nastavi_dom', { p_device: c.device_id, p_dom: drug.id })));
         await sb.from('domovi').delete().eq('id', d.id);
@@ -1386,7 +1436,7 @@
   $('b-domovi-zapri').onclick = zapriDomove;
   $('list-domovi').onclick = (e) => { if (e.target.id === 'list-domovi') zapriDomove(); };
   $('b-nov-dom').onclick = async () => {
-    const { data, error } = await sb.from('domovi').insert({ ime: t('novDomIme') }).select('id,ime');
+    const { data, error } = await sb.from('domovi').insert({ ime: t('novDomIme') }).select('id,ime,user_id');
     if (error || !data || !data[0]) return sporoci('domovi-sporocilo', prevedi(error || {}), true);
     domovi.push(data[0]); narisiDomove(data[0].id);
   };
@@ -1483,12 +1533,20 @@
     poslji(luciDoma().map(r => ({ dev: r.device_id, ch: r.channel, on: true, b: 50, t: 4 })));
     return true;
   }
+  async function pridruziSe(k) {
+    const { data, error } = await sb.rpc('pridruzi_se_domu', { p_koda: k });
+    if (error) { javiNapako(/ni veljavno/i.test(error.message || '') ? t('ePovabilo') : prevedi(error)); return false; }
+    shraniDom(data); trenutniProstor = null;
+    await naloziDomove(t('pridruzen'));
+    return true;
+  }
   async function obdelajKodo(k) {
     if (!trenutniDom || !Object.keys(naprave).length) { try { await naloziSeznamDomov(); await naloziPodatke(); } catch (_) {} }
     const { data: vrsta, error } = await sb.rpc('vrsta_kode', { p_koda: k });
     if (error) { javiNapako(prevedi(error)); return false; }
     if (vrsta === 'luc') { odpriNovoLuc(k); return true; }
     if (vrsta === 'naprava') return !!(await prevzemi(k));
+    if (vrsta === 'povabilo') return await pridruziSe(k);
     return await prevzemiKljuc(k);
   }
   let izbranProstor = null, ikonaNoveLuci = 'luc', ikonaLuciRocno = false;
@@ -1536,7 +1594,7 @@
   $('b-nazaj-luc').onclick = () => { if (trenutniProstor) odpriProstor(trenutniProstor); else naloziDomove(); };
   $('f-dodaj').onsubmit = async (e) => {
     e.preventDefault();
-    const k = $('koda').value.trim().toUpperCase();
+    const k = $('koda').value.replace(/[\s-]/g, '').toUpperCase();
     if (!/^[A-Z0-9]{6,12}$/.test(k)) return sporoci('list-sporocilo', t('eKoda'), true);
     zapriList();
     if (await obdelajKodo(k)) $('koda').value = '';
@@ -1609,6 +1667,22 @@
     const { data } = await sb.from('domovi').select('kljuc_koda').eq('id', trenutniDom).maybeSingle();
     kodaKljuca = data && data.kljuc_koda;
     narisiKljuc();
+    narisiPredaje();
+  }
+  async function narisiPredaje() {
+    const el = $('seznam-predaj'); el.innerHTML = '';
+    const { data, error } = await sb.rpc('moje_predaje');
+    if (error || !data || !data.length) { el.innerHTML = `<div class="prazno" style="padding:8px 0">${esc(t('niPredaj'))}</div>`; return; }
+    const dat = (x) => new Date(x).toLocaleDateString(jezik === 'en' ? 'en-GB' : 'sl-SI', { day: 'numeric', month: 'numeric', year: 'numeric' });
+    data.forEach(p => {
+      const v = document.createElement('div'); v.className = 'predaja-vrsta';
+      v.innerHTML = '<div class="im"></div><div class="st"></div>';
+      v.querySelector('.im').textContent = p.dom_ime || '—';
+      v.querySelector('.st').textContent = p.predano_at
+        ? `${t('predano')} ${dat(p.predano_at)} · ${p.stranka_ime || p.stranka_email || ''}`
+        : `${t('pripravljeno')} · ${t('kodaKratko')} ${p.kljuc_koda || ''}`;
+      el.appendChild(v);
+    });
   }
   function narisiKljuc() {
     $('predaja-priprava').classList.toggle('skrito', !!kodaKljuca);
@@ -1904,6 +1978,61 @@
     $('n-ime').value = m.ime || ''; $('n-priimek').value = m.priimek || '';
     $('potrdi-izbris').classList.remove('vidno');
     sporoci('nast-sporocilo', '');
+    narisiDeljenje();
+  };
+  let kodaPovabila = null;
+  async function narisiDeljenje() {
+    const el = $('seznam-clanov'); el.innerHTML = '';
+    $('povabilo').classList.add('skrito'); sporoci('deljenje-sporocilo', '');
+    const dom = domovi.find(d => d.id === trenutniDom); if (!dom) return;
+    const gost = jeGost();
+    $('deljenje-pod').textContent = gost ? t('deljenoZVami') : t('deljenjePod').replace('{dom}', dom.ime);
+    $('b-povabi').classList.toggle('skrito', gost); $('b-zapusti-dom').classList.toggle('skrito', !gost);
+    $('b-zapusti-dom').dataset.potrdi = ''; $('b-zapusti-dom').textContent = t('zapustiDom');
+    const { data } = await sb.rpc('clani_doma_seznam', { p_dom: dom.id });
+    (data || []).forEach(c => {
+      const v = document.createElement('div'); v.className = 'clan';
+      v.innerHTML = '<div><div class="im"></div><div class="st"></div></div>';
+      v.querySelector('.im').textContent = c.ime || c.email;
+      v.querySelector('.st').textContent = c.ime ? c.email : '';
+      if (c.lastnik) { const o = document.createElement('span'); o.className = 'oz'; o.textContent = t('lastnik'); v.appendChild(o); }
+      else if (!gost) {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'mali-gumb'; b.textContent = t('odstrani');
+        b.onclick = async () => {
+          if (!b.dataset.potrdi) { b.dataset.potrdi = '1'; b.textContent = t('resOdstrani'); return; }
+          const { error } = await sb.rpc('odstrani_clana', { p_dom: dom.id, p_user: c.user_id });
+          if (error) return sporoci('deljenje-sporocilo', prevedi(error), true);
+          narisiDeljenje();
+        };
+        v.appendChild(b);
+      }
+      el.appendChild(v);
+    });
+  }
+  $('b-povabi').onclick = async () => {
+    const { data, error } = await sb.rpc('povabi_v_dom', { p_dom: trenutniDom });
+    if (error) return sporoci('deljenje-sporocilo', prevedi(error), true);
+    kodaPovabila = data;
+    $('povabilo-koda').textContent = data.replace(/(.{4})/, '$1 ');
+    $('povabilo').classList.remove('skrito'); $('b-povabi').classList.add('skrito');
+  };
+  $('b-deli-povabilo').onclick = async () => {
+    if (!kodaPovabila) return;
+    const dom = domovi.find(d => d.id === trenutniDom);
+    const besedilo = t('povabiloBesedilo').replace('{dom}', dom ? dom.ime : '').replace('{koda}', kodaPovabila);
+    const url = URL_APLIKACIJE + '?koda=' + kodaPovabila;
+    try { if (navigator.share) { await navigator.share({ title: 'Stajl Home', text: besedilo, url }); return; } } catch (_) { return; }
+    try { await navigator.clipboard.writeText(besedilo + '\n' + url); sporoci('deljenje-sporocilo', t('kopiranoPovabilo')); }
+    catch (_) { sporoci('deljenje-sporocilo', besedilo + ' ' + url); }
+  };
+  $('b-zapusti-dom').onclick = async (e) => {
+    const b = e.currentTarget;
+    if (!b.dataset.potrdi) { b.dataset.potrdi = '1'; b.textContent = t('resZapusti'); return; }
+    const { error } = await sb.rpc('odstrani_clana', { p_dom: trenutniDom, p_user: uporabnik.id });
+    if (error) return sporoci('deljenje-sporocilo', prevedi(error), true);
+    try { localStorage.removeItem('stajl_dom'); } catch (_) {}
+    trenutniDom = null;
+    naloziDomove(t('zapustil'));
   };
   $('b-nastavitve').onclick = odpriNastavitve;
   $('b-shrani-ime').onclick = async () => {
