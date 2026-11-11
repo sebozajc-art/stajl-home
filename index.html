@@ -1289,7 +1289,7 @@
     if (!ukazi.length) return;
     ukazi.forEach(u => { const prej = stanjeLuci(u.dev, u.ch); lokalno[kljuc(u.dev, u.ch)] = { on: u.on, b: u.on && u.b ? u.b : prej.b, do: Date.now() + 4000 }; });
     osveziPrikaz();
-    const vrstice = ukazi.map(u => ({ device_id: u.dev, channel: u.ch, turn_on: u.on, brightness: u.on && u.b ? u.b : null }));
+    const vrstice = ukazi.map(u => Object.assign({ device_id: u.dev, channel: u.ch, turn_on: u.on, brightness: u.on && u.b ? u.b : null }, u.t ? { trajanje: u.t } : {}));
     const { error } = await sb.from('commands').insert(vrstice);
     if (error) { ukazi.forEach(u => delete lokalno[kljuc(u.dev, u.ch)]); osveziPrikaz(); if (trenutniPogled === 'v-naprava') $('status').textContent = t('ukazNi'); }
   }
@@ -1477,6 +1477,8 @@
     if (error) { javiNapako(/ni veljaven/i.test(error.message || '') ? t('eNeznanaKoda') : prevedi(error)); return false; }
     shraniDom(data); trenutniProstor = null;
     await naloziDomove(t('domPrevzet'));
+    // dobrodošlica: vse luči v domu se počasi prižgejo na 50 %
+    poslji(luciDoma().map(r => ({ dev: r.device_id, ch: r.channel, on: true, b: 50, t: 4 })));
     return true;
   }
   async function obdelajKodo(k) {
