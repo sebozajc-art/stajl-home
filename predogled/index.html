@@ -189,7 +189,7 @@
   .moznost.glavna small { color:rgba(244,243,241,.7); }
   .kljuc-qr { width:220px; margin:18px auto 8px; background:#fff; padding:10px; border-radius:10px; }
   .kljuc-qr svg { width:100%; height:auto; display:block; }
-  .kljuc-koda { text-align:center; font-size:22px; font-weight:300; letter-spacing:.25em; }
+  .kljuc-koda { text-align:center; font-size:30px; font-weight:300; letter-spacing:.25em; margin:14px 0 4px; }
   .mali-gumb { flex:none; font:inherit; font-size:12px; letter-spacing:.06em; padding:9px 16px; border-radius:999px; border:1px solid var(--crta); background:transparent; color:var(--tekst); cursor:pointer; }
   .dom-vrsta { display:flex; align-items:center; gap:8px; background:var(--plosca); border-radius:8px; padding:4px 6px 4px 16px; margin-top:6px; }
   .dom-vrsta .izb { flex:1; background:none; border:0; text-align:left; font:inherit; font-size:16px; color:var(--tekst); padding:14px 0; cursor:pointer; }
@@ -523,11 +523,13 @@
       <button class="gl" id="b-pripravi-predajo" data-t="pripraviPredajo"></button>
     </div>
     <div id="predaja-kljuc" class="skrito">
-      <div class="kljuc-qr" id="kljuc-qr"></div>
+      <div class="oznaka" data-t="kodaKljuca"></div>
       <div class="kljuc-koda" id="kljuc-koda"></div>
-      <div class="noga" style="margin:6px 0 16px" data-t="kljucNasvet"></div>
-      <button class="sek" id="b-prenesi-svg" data-t="prenesiSvg"></button>
+      <div class="noga" style="margin:8px 0 16px" data-t="kljucNasvet"></div>
+      <button class="gl skrito" id="b-zapisi-nfc" type="button" data-t="zapisiNfc"></button>
+      <div class="sporocilo" id="nfc-sporocilo"></div>
       <button class="sek" id="b-kopiraj-povezavo" style="margin-top:10px" data-t="kopirajPovezavo"></button>
+      <div class="noga" style="text-align:left; margin-top:10px" id="nfc-navodila" data-t="nfcNavodila"></div>
       <button class="povezava" id="b-nova-koda-kljuca" style="margin-top:18px" data-t="novaKodaKljuca"></button>
     </div>
   </section>
@@ -582,10 +584,10 @@
       nimateRacuna: 'Nimate računa? <b>Ustvari račun</b>', euPodatki: 'Podatki so shranjeni v EU. Zgodovina uporabe luči se ne hrani.',
       novoGeslo: 'Novo geslo', novoGesloPod: 'Vpišite novo geslo (vsaj 8 znakov).', shraniGeslo: 'Shrani geslo', obnovaKorak1: 'Vpišite e-pošto računa. Poslali vam bomo kodo za novo geslo.', obnovaKorak2: 'Kodo smo poslali na {email}. Vpišite jo in izberite novo geslo.', posljiKodo: 'Pošlji kodo', kodaIzMaila: 'Koda iz e-pošte', novoGesloPolje: 'Novo geslo (vsaj 8 znakov)', posljiNovoKodo: 'Pošlji novo kodo', potrdiKodo: 'Potrdi kodo', ponoviGeslo: 'Ponovite novo geslo', eGeslaRazlicna: 'Gesli se ne ujemata.', obnovaKorak3: 'Koda je potrjena. Vpišite novo geslo.', posljiZnova: 'Ponovno pošiljanje čez {s} s', nazajNaPrijavo: '← Nazaj na prijavo', velja: 'Koda velja še {cas}', kodaPotekla: 'Koda je potekla. Pošljite novo kodo.', eKodaObnove: 'Koda ni pravilna ali je potekla.', ePosiljanje: 'E-pošte trenutno ni bilo mogoče poslati. Poskusite znova čez nekaj minut.', gesloSpremenjeno: 'Geslo je spremenjeno.',
       naprave: 'Naprave', prostori: 'Prostori', prostor: 'Prostor',
-      zacetekPod: 'Če ste stanovanje opremili pri Mizarstvu Stajl, ste ob predaji dobili ključ doma.', zacKljuc: 'Prisloni ali skeniraj ključ', zacKljucPod: 'Vaš dom z lučmi in scenami se pripravi sam', zacNov: 'Ustvari nov dom', zacNovPod: 'Prostore in luči dodate sami',
+      zacetekPod: 'Če ste stanovanje opremili pri Mizarstvu Stajl, ste ob predaji dobili ključ doma.', zacKljuc: 'Prisloni ključ ali vpiši kodo', zacKljucPod: 'Vaš dom z lučmi in scenami se pripravi sam', kljucPrislonite: 'Ključ prislonite na hrbet telefona ali vpišite kodo s kartice.', kodaKljuca: 'Koda ključa', zapisiNfc: 'Zapiši na ključ (NFC)', nfcPrislonite: 'Ključ prislonite na hrbet telefona …', nfcZapisano: 'Zapisano. Ključ je pripravljen.', nfcNapaka: 'Zapis ni uspel. Poskusite znova ali uporabite NFC Tools.', nfcNavodila: 'Na iPhonu: kopirajte povezavo in jo v aplikaciji NFC Tools zapišite na čip (Write → Add a record → URL). Kodo natisnite na kartico, če kdaj NFC ne deluje.', zacNov: 'Ustvari nov dom', zacNovPod: 'Prostore in luči dodate sami',
       domPrevzet: 'Dobrodošli doma. Vse je pripravljeno.', predajaNaslov: 'Predaja', predajaGumb: 'Predaja stranki', predajaGumbPod: 'Ključ doma za trenutni dom',
       predajaRazlaga: 'Ko so vse luči poimenovane in razporejene po prostorih, pripravite ključ. Če scen še ni, se samodejno ustvarijo Večer, Jutro in Noč. Ko stranka prisloni ključ, se ji cel dom prenese na njen račun, vaš dostop pa se zaključi.',
-      pripraviPredajo: 'Pripravi ključ', kljucNasvet: 'To QR kodo vgravirajte na ključ ali jo zapišite na NFC čip. Velja enkrat – za prevzem doma.', prenesiSvg: 'Prenesi QR za gravuro (SVG)', kopirajPovezavo: 'Kopiraj povezavo za NFC', kopirano: 'Povezava je kopirana.', novaKodaKljuca: 'Ključ je izgubljen – nova koda', kodaZamenjana: 'Stara koda ne deluje več. Naredite nov ključ.',
+      pripraviPredajo: 'Pripravi ključ', kljucNasvet: 'Ključ s to kodo velja enkrat – za prevzem doma. Kodo natisnite na kartico dobrodošlice.', prenesiSvg: 'Prenesi QR za gravuro (SVG)', kopirajPovezavo: 'Kopiraj povezavo za NFC', kopirano: 'Povezava je kopirana.', novaKodaKljuca: 'Ključ je izgubljen – nova koda', kodaZamenjana: 'Stara koda ne deluje več. Naredite nov ključ.',
       scVecer: 'Večer', scJutro: 'Jutro', scNoc: 'Noč', ikona: 'Ikona', urediProstor: 'Uredi prostor', imeInIkona: 'Ime in ikona', imeInIkonaPod: 'Preimenujte prostor ali izberite drugo ikono', izbrisiProstorPod: 'Luči ostanejo v napravi, iz prostora se odstranijo', katKuhinja: 'Kuhinja', katDnevna: 'Dnevna in jedilnica', katSpalnica: 'Spalnica', katKopalnica: 'Kopalnica', katSplosno: 'Splošno', uredi: 'Uredi', koncano: 'Končano', vseUgasni: 'Vse ugasni', scena: 'Scena',
       gori1: '{n} luč gori', gori2: '{n} luči gorita', gori3: '{n} luči gorijo', goriN: '{n} luči gori', ugasnjeno: 'Ugasnjeno', vseUgasnjeno: 'Vse luči so ugasnjene', brezLuci: 'Še brez luči',
       prostorPrazen: 'Pritisnite »+ Dodaj« in skenirajte QR kodo na nalepki luči.', novProstor: 'Nov prostor', imeProstora: 'Ime prostora', imeProstoraPh: 'npr. Kuhinja, Dnevna', preimenujProstor: 'Preimenuj prostor', izbrisiProstor: 'Izbriši prostor', resIzbrisi: 'Tapnite še enkrat za potrditev', eImeProstora: 'Vpišite ime prostora.', aliNovProstor: 'ali vpišite nov prostor',
@@ -636,10 +638,10 @@
       nimateRacuna: 'No account yet? <b>Create account</b>', euPodatki: 'Data is stored in the EU. No history of light usage is kept.',
       novoGeslo: 'New password', novoGesloPod: 'Enter a new password (at least 8 characters).', shraniGeslo: 'Save password', obnovaKorak1: 'Enter your account email. We will send you a code for a new password.', obnovaKorak2: 'We sent a code to {email}. Enter it and choose a new password.', posljiKodo: 'Send code', kodaIzMaila: 'Code from email', novoGesloPolje: 'New password (at least 8 characters)', posljiNovoKodo: 'Send a new code', potrdiKodo: 'Confirm code', ponoviGeslo: 'Repeat new password', eGeslaRazlicna: 'The passwords do not match.', obnovaKorak3: 'Code confirmed. Enter a new password.', posljiZnova: 'Resend in {s} s', nazajNaPrijavo: '← Back to sign in', velja: 'Code valid for {cas}', kodaPotekla: 'The code has expired. Send a new one.', eKodaObnove: 'The code is wrong or has expired.', ePosiljanje: 'The email could not be sent right now. Please try again in a few minutes.', gesloSpremenjeno: 'Password changed.',
       naprave: 'Devices', prostori: 'Rooms', prostor: 'Room',
-      zacetekPod: 'If Mizarstvo Stajl furnished your home, you received a home key at handover.', zacKljuc: 'Tap or scan your key', zacKljucPod: 'Your home with lights and scenes sets itself up', zacNov: 'Create a new home', zacNovPod: 'Add rooms and lights yourself',
+      zacetekPod: 'If Mizarstvo Stajl furnished your home, you received a home key at handover.', zacKljuc: 'Tap your key or enter the code', zacKljucPod: 'Your home with lights and scenes sets itself up', kljucPrislonite: 'Hold the key to the back of your phone or enter the code from the card.', kodaKljuca: 'Key code', zapisiNfc: 'Write to key (NFC)', nfcPrislonite: 'Hold the key to the back of the phone …', nfcZapisano: 'Written. The key is ready.', nfcNapaka: 'Writing failed. Try again or use NFC Tools.', nfcNavodila: 'On iPhone: copy the link and write it to the chip with the NFC Tools app (Write → Add a record → URL). Print the code on the card in case NFC ever fails.', zacNov: 'Create a new home', zacNovPod: 'Add rooms and lights yourself',
       domPrevzet: 'Welcome home. Everything is ready.', predajaNaslov: 'Handover', predajaGumb: 'Hand over to client', predajaGumbPod: 'Home key for the current home',
       predajaRazlaga: 'Once all lights are named and placed in rooms, prepare the key. If there are no scenes yet, Evening, Morning and Night are created automatically. When the client taps the key, the whole home moves to their account and your access ends.',
-      pripraviPredajo: 'Prepare key', kljucNasvet: 'Engrave this QR code on the key or write it to an NFC chip. It works once – to take over the home.', prenesiSvg: 'Download QR for engraving (SVG)', kopirajPovezavo: 'Copy link for NFC', kopirano: 'Link copied.', novaKodaKljuca: 'Key lost – new code', kodaZamenjana: 'The old code no longer works. Make a new key.',
+      pripraviPredajo: 'Prepare key', kljucNasvet: 'A key with this code works once – to take over the home. Print the code on the welcome card.', prenesiSvg: 'Download QR for engraving (SVG)', kopirajPovezavo: 'Copy link for NFC', kopirano: 'Link copied.', novaKodaKljuca: 'Key lost – new code', kodaZamenjana: 'The old code no longer works. Make a new key.',
       scVecer: 'Evening', scJutro: 'Morning', scNoc: 'Night', ikona: 'Icon', urediProstor: 'Edit room', imeInIkona: 'Name and icon', imeInIkonaPod: 'Rename the room or choose another icon', izbrisiProstorPod: 'Lights stay on the device and are removed from this room', katKuhinja: 'Kitchen', katDnevna: 'Living and dining', katSpalnica: 'Bedroom', katKopalnica: 'Bathroom', katSplosno: 'General', uredi: 'Edit', koncano: 'Done', vseUgasni: 'All off', scena: 'Scene',
       gori1: '{n} light on', gori2: '{n} lights on', gori3: '{n} lights on', goriN: '{n} lights on', ugasnjeno: 'Off', vseUgasnjeno: 'All lights are off', brezLuci: 'No lights yet',
       prostorPrazen: 'Tap “+ Add” and scan the QR code on the light sticker.', novProstor: 'New room', imeProstora: 'Room name', imeProstoraPh: 'e.g. Kitchen, Living room', preimenujProstor: 'Rename room', izbrisiProstor: 'Delete room', resIzbrisi: 'Tap again to confirm', eImeProstora: 'Enter a room name.', aliNovProstor: 'or type a new room',
@@ -1131,7 +1133,23 @@
   let zacetekSkrit = false;
   $('b-zac-kljuc').querySelector('.ik').innerHTML = svg('kljuc');
   $('b-zac-nov').querySelector('.ik').innerHTML = svg('r_dom');
-  $('b-zac-kljuc').onclick = () => odpriList();
+  $('b-zac-kljuc').onclick = () => { odpriList(); $('b-rocno').onclick(); sporoci('list-sporocilo', t('kljucPrislonite')); beriNfc(); };
+  let nfcBralec = null;
+  async function beriNfc() {
+    if (!('NDEFReader' in window) || nfcBralec) return;
+    try {
+      nfcBralec = new NDEFReader(); await nfcBralec.scan();
+      nfcBralec.onreading = (e) => {
+        for (const r of e.message.records) {
+          try {
+            const besedilo = new TextDecoder().decode(r.data);
+            const k = kodaIzQR(besedilo);
+            if (k) { if (navigator.vibrate) navigator.vibrate(40); zapriList(); obdelajKodo(k); return; }
+          } catch (_) {}
+        }
+      };
+    } catch (_) { nfcBralec = null; }
+  }
   $('b-zac-nov').onclick = () => { zacetekSkrit = true; narisiDom(); odpriListProstor('nov'); };
   function posodobiDom() {
     const vse = luciDoma();
@@ -1595,7 +1613,10 @@
     $('predaja-kljuc').classList.toggle('skrito', !kodaKljuca);
     if (!kodaKljuca) return;
     $('kljuc-koda').textContent = kodaKljuca.replace(/(.{5})/, '$1 ');
-    $('kljuc-qr').innerHTML = qrSvg(URL_APLIKACIJE + '?koda=' + kodaKljuca, 4);
+    const imaNfc = 'NDEFReader' in window;
+    $('b-zapisi-nfc').classList.toggle('skrito', !imaNfc);
+    $('nfc-navodila').classList.toggle('skrito', imaNfc);
+    sporoci('nfc-sporocilo', '');
   }
   function qrSvg(besedilo, rob) {
     if (!window.qrcode) return '';
@@ -1629,11 +1650,14 @@
     } catch (err) { sporoci('predaja-sporocilo', prevedi(err), true); }
     $('b-pripravi-predajo').disabled = false;
   };
-  $('b-prenesi-svg').onclick = () => {
-    const svgTxt = qrSvg(URL_APLIKACIJE + '?koda=' + kodaKljuca, 0);
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([svgTxt], { type: 'image/svg+xml' }));
-    a.download = 'kljuc-' + kodaKljuca + '.svg'; document.body.appendChild(a); a.click(); a.remove();
+  $('b-zapisi-nfc').onclick = async () => {
+    try {
+      const w = new NDEFReader();
+      sporoci('nfc-sporocilo', t('nfcPrislonite'));
+      await w.write({ records: [{ recordType: 'url', data: URL_APLIKACIJE + '?koda=' + kodaKljuca }] });
+      sporoci('nfc-sporocilo', t('nfcZapisano'));
+      if (navigator.vibrate) navigator.vibrate(60);
+    } catch (err) { sporoci('nfc-sporocilo', t('nfcNapaka'), true); }
   };
   $('b-kopiraj-povezavo').onclick = async () => {
     try { await navigator.clipboard.writeText(URL_APLIKACIJE + '?koda=' + kodaKljuca); sporoci('predaja-sporocilo', t('kopirano')); }
