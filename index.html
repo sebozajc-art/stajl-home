@@ -555,6 +555,14 @@
     <input type="range" id="sc-prizig" min="0" max="10" step="0.5" value="1">
     <label for="sc-ugas" class="drsnik-oznaka"><span data-t="ugasCas"></span><span id="sc-ugas-v"></span></label>
     <input type="range" id="sc-ugas" min="0" max="60" step="0.5" value="1">
+    <div class="oznaka" data-t="scenaCasovnik"></div>
+    <div class="cipi" id="sc-casovnik-vklop"></div>
+    <div id="sc-casovnik" class="skrito">
+      <div class="dvojno"><div><label for="sc-od" data-t="od"></label><input type="time" id="sc-od" value="18:00"></div>
+      <div><label for="sc-do" data-t="do"></label><input type="time" id="sc-do" value="23:00"></div></div>
+      <label data-t="dnevi"></label>
+      <div class="cipi" id="sc-dnevi"></div>
+    </div>
     <button class="sek" id="b-scena-preizkusi" style="margin-top:14px" data-t="preizkusi"></button>
     <button class="gl" id="b-scena-shrani" data-t="shrani"></button>
     <button class="sek skrito" id="b-scena-izbrisi" style="margin-top:10px" data-t="izbrisiSceno"></button>
@@ -701,7 +709,7 @@
       predlogi: ['Pult', 'Zgornje omare', 'Vitrina', 'Podnožje', 'Notranjost omar', 'Strop', 'Polica'],
       scene: ['Kuhanje', 'Večer', 'Noč', 'Vse ugasni'],
       novaScena: 'Nova scena', urediSceno: 'Uredi sceno', scenaPod: 'Izberite luči in njihovo svetlost. Ko sceno pritisnete, gre vse na te nastavitve.',
-      scenaIme: 'Ime scene', scenaCasi: 'Kako hitro se scena prižge in ugasne', scenaPredlogi: ['Fešta', 'Branje', 'Zajtrk', 'Film', 'Gostje'], preizkusi: 'Preizkusi',
+      scenaIme: 'Ime scene', scenaCasi: 'Kako hitro se scena prižge in ugasne', scenaCasovnik: 'Časovnik', casovnikIzkl: 'Brez časovnika', casovnikVkl: 'Od–do po urniku', od: 'Od', scenaPredlogi: ['Fešta', 'Branje', 'Zajtrk', 'Film', 'Gostje'], preizkusi: 'Preizkusi',
       izbrisiSceno: 'Izbriši sceno', eScenaIme: 'Vpišite ime scene.', eScenaLuc: 'Prižgite vsaj eno luč.', scenaShranjena: 'Scena je shranjena.',
       ugasnjena: 'Ugasnjena'
     },
@@ -761,7 +769,7 @@
       predlogi: ['Countertop', 'Wall cabinets', 'Display cabinet', 'Plinth', 'Inside cabinets', 'Ceiling', 'Shelf'],
       scene: ['Cooking', 'Evening', 'Night', 'All off'],
       novaScena: 'New scene', urediSceno: 'Edit scene', scenaPod: 'Choose the lights and their brightness. Tap the scene and everything goes to these settings.',
-      scenaIme: 'Scene name', scenaCasi: 'How fast the scene fades in and out', scenaPredlogi: ['Party', 'Reading', 'Breakfast', 'Movie', 'Guests'], preizkusi: 'Try it',
+      scenaIme: 'Scene name', scenaCasi: 'How fast the scene fades in and out', scenaCasovnik: 'Timer', casovnikIzkl: 'No timer', casovnikVkl: 'From–to on a schedule', od: 'From', scenaPredlogi: ['Party', 'Reading', 'Breakfast', 'Movie', 'Guests'], preizkusi: 'Try it',
       izbrisiSceno: 'Delete scene', eScenaIme: 'Enter a scene name.', eScenaLuc: 'Turn on at least one light.', scenaShranjena: 'Scene saved.',
       ugasnjena: 'Off'
     }
@@ -1903,6 +1911,7 @@
     $('b-scena-izbrisi').classList.toggle('skrito', !s);
     $('sc-prizig').value = s && s.prizig != null ? s.prizig : 1; $('sc-ugas').value = s && s.ugas != null ? s.ugas : 1;
     casiScene();
+    naloziCasovnikScene(s);
     sporoci('scena-sporocilo', '');
     const el = $('scena-luci'); el.innerHTML = '';
     prostori.forEach(p => {
@@ -1933,16 +1942,60 @@
     $('sc-prizig-v').textContent = f($('sc-prizig').value); $('sc-ugas-v').textContent = f($('sc-ugas').value);
   }
   $('sc-prizig').oninput = casiScene; $('sc-ugas').oninput = casiScene;
+  // časovnik scene: od–do ob izbranih dnevih (shrani se kot urniki vseh luči scene, deluje tudi na krmilniku brez interneta)
+  let scCasovnik = false, scDnevi = [1, 2, 3, 4, 5, 6, 7];
+  function narisiCasovnik() {
+    const v = $('sc-casovnik-vklop'); v.innerHTML = '';
+    [[false, t('casovnikIzkl')], [true, t('casovnikVkl')]].forEach(([x, ime]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cip' + (scCasovnik === x ? ' izbran' : ''); b.textContent = ime;
+      b.onclick = () => { scCasovnik = x; narisiCasovnik(); }; v.appendChild(b);
+    });
+    $('sc-casovnik').classList.toggle('skrito', !scCasovnik);
+    const d = $('sc-dnevi'); d.innerHTML = '';
+    t('dneviKratko').forEach((ime, x) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cip' + (scDnevi.includes(x + 1) ? ' izbran' : ''); b.textContent = ime;
+      b.onclick = () => { scDnevi = scDnevi.includes(x + 1) ? scDnevi.filter(y => y !== x + 1) : scDnevi.concat(x + 1); narisiCasovnik(); };
+      d.appendChild(b);
+    });
+  }
+  async function naloziCasovnikScene(s) {
+    scCasovnik = false; scDnevi = [1, 2, 3, 4, 5, 6, 7]; $('sc-od').value = '18:00'; $('sc-do').value = '23:00';
+    narisiCasovnik();
+    if (!s) return;
+    const { data } = await sb.from('urniki').select('ura,ura_do,dnevi').eq('scena_id', s.id).limit(1);
+    if (data && data.length) {
+      scCasovnik = true; scDnevi = data[0].dnevi || scDnevi;
+      $('sc-od').value = String(data[0].ura).slice(0, 5); if (data[0].ura_do) $('sc-do').value = String(data[0].ura_do).slice(0, 5);
+      narisiCasovnik();
+    }
+  }
+  async function shraniCasovnikScene(id, nastavi) {
+    await sb.from('urniki').delete().eq('scena_id', id);
+    if (!scCasovnik || !scDnevi.length) return null;
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Ljubljana';
+    const vrstice = Object.entries(nastavi).filter(([, b]) => b > 0).map(([k, b]) => {
+      const x = lociKljuc(k);
+      return { device_id: x.dev, channel: x.ch, ura: $('sc-od').value || '18:00', ura_do: $('sc-do').value || null, dnevi: [...scDnevi].sort(),
+        prizgi: true, svetlost: +b, trajanje: Math.round(+$('sc-prizig').value), scena_id: id, tz };
+    }).filter(v => !(naprave[v.device_id] && naprave[v.device_id].demo));
+    if (!vrstice.length) return null;
+    const { error } = await sb.from('urniki').insert(vrstice);
+    return error;
+  }
   $('b-scena-preizkusi').onclick = () => uporabiSceno({ nastavi: polnaScena(), prizig: +$('sc-prizig').value, ugas: +$('sc-ugas').value });
   $('b-scena-shrani').onclick = async () => {
     const ime = $('scena-ime').value.trim();
     if (!ime) return sporoci('scena-sporocilo', t('eScenaIme'), true);
     if (!Object.keys(scenaNast).length) return sporoci('scena-sporocilo', t('eScenaLuc'), true);
     const nastavi = polnaScena();
-    const { error } = urejanaScena
-      ? await sb.from('scene_doma').update({ ime, nastavi, ikona: ikonaScene, prizig: +$('sc-prizig').value, ugas: +$('sc-ugas').value }).eq('id', urejanaScena.id)
-      : await sb.from('scene_doma').insert({ dom_id: trenutniDom, ime, nastavi, ikona: ikonaScene, prizig: +$('sc-prizig').value, ugas: +$('sc-ugas').value });
+    if (scCasovnik && !scDnevi.length) return sporoci('scena-sporocilo', t('eDnevi'), true);
+    const pod = { ime, nastavi, ikona: ikonaScene, prizig: +$('sc-prizig').value, ugas: +$('sc-ugas').value };
+    const { data: sd, error } = urejanaScena
+      ? await sb.from('scene_doma').update(pod).eq('id', urejanaScena.id).select('id')
+      : await sb.from('scene_doma').insert(Object.assign({ dom_id: trenutniDom }, pod)).select('id');
     if (error) return sporoci('scena-sporocilo', prevedi(error), true);
+    const sid = urejanaScena ? urejanaScena.id : (sd && sd[0] && sd[0].id);
+    if (sid) { const e2 = await shraniCasovnikScene(sid, nastavi); if (e2) return sporoci('scena-sporocilo', prevedi(e2), true); }
     urejamScene = false;
     naloziDomove();
   };
@@ -2113,7 +2166,7 @@
   }
   async function naloziUrnike() {
     const el = $('seznam-urnikov');
-    const { data, error } = await sb.from('urniki').select('id,ura,ura_do,dnevi,prizgi,svetlost,aktiven,trajanje').eq('device_id', luci[odprtaLuc].dev).eq('channel', luci[odprtaLuc].ch).order('ura');
+    const { data, error } = await sb.from('urniki').select('id,ura,ura_do,dnevi,prizgi,svetlost,aktiven,trajanje').eq('device_id', luci[odprtaLuc].dev).eq('channel', luci[odprtaLuc].ch).is('scena_id', null).order('ura');
     if (error) { el.innerHTML = `<div class="prazno">${esc(prevedi(error))}</div>`; return; }
     if (!data.length) { el.innerHTML = `<div class="prazno" style="padding:12px 0 16px">${esc(t('niUrnikov'))}</div>`; return; }
     el.innerHTML = '';
