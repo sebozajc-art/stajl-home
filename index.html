@@ -1983,12 +1983,12 @@
   $('luc-drsnik').oninput = () => {
     const v = +$('luc-drsnik').value, l = luci[odprtaLuc]; $('luc-odst').textContent = v + ' %';
     clearTimeout(drsnikTimer);
-    if (Date.now() - drsnikCas > 300) { drsnikCas = Date.now(); poslji([{ dev: l.dev, ch: l.ch, on: true, b: v, t: 0 }]); }
-    else drsnikTimer = setTimeout(() => poslji([{ dev: l.dev, ch: l.ch, on: true, b: v, t: 0 }]), 320);
+    if (Date.now() - drsnikCas > 600) { drsnikCas = Date.now(); poslji([{ dev: l.dev, ch: l.ch, on: true, b: v, t: 0 }]); }
+    else drsnikTimer = setTimeout(() => poslji([{ dev: l.dev, ch: l.ch, on: true, b: v, t: 0 }]), 620);
   };
   ['pointerdown', 'touchstart', 'mousedown'].forEach(e => $('luc-drsnik').addEventListener(e, () => { vlecemDrsnik = true; }, { passive: true }));
   ['pointerup', 'pointercancel', 'touchend', 'touchcancel', 'mouseup'].forEach(e => $('luc-drsnik').addEventListener(e, () => { vlecemDrsnik = false; drsnikSpuscen = Date.now(); }, { passive: true }));
-  $('luc-drsnik').onchange = () => { const l = luci[odprtaLuc]; poslji([{ dev: l.dev, ch: l.ch, on: true, b: +$('luc-drsnik').value, t: 0 }]); };
+  $('luc-drsnik').onchange = () => { clearTimeout(drsnikTimer); const l = luci[odprtaLuc]; poslji([{ dev: l.dev, ch: l.ch, on: true, b: +$('luc-drsnik').value, t: 0 }]); };
   $('b-nazaj-podr').onclick = () => odpriProstor(trenutniProstor);
   // ---------- urejanje luči: meni ----------
   $('b-luc-ime').querySelector('.ik').innerHTML = svg('l_predal');
