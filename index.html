@@ -550,6 +550,11 @@
     <div class="cipi" id="scena-predlogi"></div>
     <div class="oznaka" data-t="luci"></div>
     <div id="scena-luci"></div>
+    <div class="oznaka" data-t="scenaCasi"></div>
+    <label for="sc-prizig" class="drsnik-oznaka"><span data-t="prizigCas"></span><span id="sc-prizig-v"></span></label>
+    <input type="range" id="sc-prizig" min="0" max="10" step="0.5" value="1">
+    <label for="sc-ugas" class="drsnik-oznaka"><span data-t="ugasCas"></span><span id="sc-ugas-v"></span></label>
+    <input type="range" id="sc-ugas" min="0" max="60" step="0.5" value="1">
     <button class="sek" id="b-scena-preizkusi" style="margin-top:14px" data-t="preizkusi"></button>
     <button class="gl" id="b-scena-shrani" data-t="shrani"></button>
     <button class="sek skrito" id="b-scena-izbrisi" style="margin-top:10px" data-t="izbrisiSceno"></button>
@@ -696,7 +701,7 @@
       predlogi: ['Pult', 'Zgornje omare', 'Vitrina', 'Podnožje', 'Notranjost omar', 'Strop', 'Polica'],
       scene: ['Kuhanje', 'Večer', 'Noč', 'Vse ugasni'],
       novaScena: 'Nova scena', urediSceno: 'Uredi sceno', scenaPod: 'Izberite luči in njihovo svetlost. Ko sceno pritisnete, gre vse na te nastavitve.',
-      scenaIme: 'Ime scene', scenaPredlogi: ['Fešta', 'Branje', 'Zajtrk', 'Film', 'Gostje'], preizkusi: 'Preizkusi',
+      scenaIme: 'Ime scene', scenaCasi: 'Kako hitro se scena prižge in ugasne', scenaPredlogi: ['Fešta', 'Branje', 'Zajtrk', 'Film', 'Gostje'], preizkusi: 'Preizkusi',
       izbrisiSceno: 'Izbriši sceno', eScenaIme: 'Vpišite ime scene.', eScenaLuc: 'Prižgite vsaj eno luč.', scenaShranjena: 'Scena je shranjena.',
       ugasnjena: 'Ugasnjena'
     },
@@ -756,7 +761,7 @@
       predlogi: ['Countertop', 'Wall cabinets', 'Display cabinet', 'Plinth', 'Inside cabinets', 'Ceiling', 'Shelf'],
       scene: ['Cooking', 'Evening', 'Night', 'All off'],
       novaScena: 'New scene', urediSceno: 'Edit scene', scenaPod: 'Choose the lights and their brightness. Tap the scene and everything goes to these settings.',
-      scenaIme: 'Scene name', scenaPredlogi: ['Party', 'Reading', 'Breakfast', 'Movie', 'Guests'], preizkusi: 'Try it',
+      scenaIme: 'Scene name', scenaCasi: 'How fast the scene fades in and out', scenaPredlogi: ['Party', 'Reading', 'Breakfast', 'Movie', 'Guests'], preizkusi: 'Try it',
       izbrisiSceno: 'Delete scene', eScenaIme: 'Enter a scene name.', eScenaLuc: 'Turn on at least one light.', scenaShranjena: 'Scene saved.',
       ugasnjena: 'Off'
     }
@@ -1173,7 +1178,7 @@
       sb.from('devices').select(IZBRANO),
       sb.from('prostori').select('id,dom_id,ime,ikona').eq('dom_id', trenutniDom).order('created_at'),
       sb.from('luci_prostorov').select('device_id,channel,prostor_id,ikona'),
-      sb.from('scene_doma').select('id,ime,nastavi,ikona').eq('dom_id', trenutniDom).order('created_at')
+      sb.from('scene_doma').select('id,ime,nastavi,ikona,prizig,ugas').eq('dom_id', trenutniDom).order('created_at')
     ]);
     if (nd.error) throw nd.error;
     if (pr.error) throw pr.error;
@@ -1429,7 +1434,8 @@
   }
   function uporabiSceno(s) {
     const v = new Set(luciDoma().map(r => kljuc(r.device_id, r.channel)));
-    const u = Object.entries(s.nastavi || {}).filter(([k]) => v.has(k)).map(([k, b]) => { const x = lociKljuc(k); return b > 0 ? { dev: x.dev, ch: x.ch, on: true, b: +b } : { dev: x.dev, ch: x.ch, on: false }; });
+    const pr = s.prizig != null ? +s.prizig : 1, ug = s.ugas != null ? +s.ugas : 1;
+    const u = Object.entries(s.nastavi || {}).filter(([k]) => v.has(k)).map(([k, b]) => { const x = lociKljuc(k); return b > 0 ? { dev: x.dev, ch: x.ch, on: true, b: +b, t: pr } : { dev: x.dev, ch: x.ch, on: false, t: ug }; });
     poslji(u);
   }
   $('b-dodaj-luc').onclick = odpriList;
@@ -1895,6 +1901,8 @@
     ikonaScene = s ? (s.ikona || ikonaSceno(s.ime)) : 'luc'; ikonaSceneRocno = !!s;
     izbiraIkon($('scena-ikone'), [[null, IKONE_SCEN]], ikonaScene, k => { ikonaScene = k; ikonaSceneRocno = true; });
     $('b-scena-izbrisi').classList.toggle('skrito', !s);
+    $('sc-prizig').value = s && s.prizig != null ? s.prizig : 1; $('sc-ugas').value = s && s.ugas != null ? s.ugas : 1;
+    casiScene();
     sporoci('scena-sporocilo', '');
     const el = $('scena-luci'); el.innerHTML = '';
     prostori.forEach(p => {
@@ -1920,15 +1928,20 @@
     return n;
   }
   $('b-nazaj-scena').onclick = () => naloziDomove();
-  $('b-scena-preizkusi').onclick = () => uporabiSceno({ nastavi: polnaScena() });
+  function casiScene() {
+    const f = v => +v === 0 ? t('takoj') : String(+v).replace('.', jezik === 'sl' ? ',' : '.') + ' s';
+    $('sc-prizig-v').textContent = f($('sc-prizig').value); $('sc-ugas-v').textContent = f($('sc-ugas').value);
+  }
+  $('sc-prizig').oninput = casiScene; $('sc-ugas').oninput = casiScene;
+  $('b-scena-preizkusi').onclick = () => uporabiSceno({ nastavi: polnaScena(), prizig: +$('sc-prizig').value, ugas: +$('sc-ugas').value });
   $('b-scena-shrani').onclick = async () => {
     const ime = $('scena-ime').value.trim();
     if (!ime) return sporoci('scena-sporocilo', t('eScenaIme'), true);
     if (!Object.keys(scenaNast).length) return sporoci('scena-sporocilo', t('eScenaLuc'), true);
     const nastavi = polnaScena();
     const { error } = urejanaScena
-      ? await sb.from('scene_doma').update({ ime, nastavi, ikona: ikonaScene }).eq('id', urejanaScena.id)
-      : await sb.from('scene_doma').insert({ dom_id: trenutniDom, ime, nastavi, ikona: ikonaScene });
+      ? await sb.from('scene_doma').update({ ime, nastavi, ikona: ikonaScene, prizig: +$('sc-prizig').value, ugas: +$('sc-ugas').value }).eq('id', urejanaScena.id)
+      : await sb.from('scene_doma').insert({ dom_id: trenutniDom, ime, nastavi, ikona: ikonaScene, prizig: +$('sc-prizig').value, ugas: +$('sc-ugas').value });
     if (error) return sporoci('scena-sporocilo', prevedi(error), true);
     urejamScene = false;
     naloziDomove();
