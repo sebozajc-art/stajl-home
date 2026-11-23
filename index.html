@@ -1921,7 +1921,7 @@
   };
 
   // ---------- podrobnosti luči in urnik ----------
-  let odprtaLuc = null, drsnikCas = 0, drsnikTimer = null, urnikDnevi = [1, 2, 3, 4, 5, 6, 7], urnikPrizgi = true, urnikTrajanje = 0, urnikOdDo = false;
+  let odprtaLuc = null, drsnikCas = 0, drsnikTimer = null, vlecemDrsnik = false, drsnikSpuscen = 0, urnikDnevi = [1, 2, 3, 4, 5, 6, 7], urnikPrizgi = true, urnikTrajanje = 0, urnikOdDo = false;
   function odpriLuc(k) {
     odprtaLuc = k;
     const l = luci[k];
@@ -1936,7 +1936,7 @@
     const s = stanje(odprtaLuc);
     $('luc-odst').textContent = s.on ? s.b + ' %' : t('lucUgasnjena');
     $('luc-stikalo').classList.toggle('on', s.on);
-    if (document.activeElement !== $('luc-drsnik')) $('luc-drsnik').value = s.b || 100;
+    if (!vlecemDrsnik && Date.now() - drsnikSpuscen > 2000 && document.activeElement !== $('luc-drsnik')) $('luc-drsnik').value = s.b || 100;
     $('luc-pod').textContent = trenutniProstor ? trenutniProstor.ime : '';
   }
   function narisiPremik() {
@@ -1980,6 +1980,8 @@
     if (Date.now() - drsnikCas > 300) { drsnikCas = Date.now(); poslji([{ dev: l.dev, ch: l.ch, on: true, b: v, t: 0 }]); }
     else drsnikTimer = setTimeout(() => poslji([{ dev: l.dev, ch: l.ch, on: true, b: v, t: 0 }]), 320);
   };
+  ['pointerdown', 'touchstart', 'mousedown'].forEach(e => $('luc-drsnik').addEventListener(e, () => { vlecemDrsnik = true; }, { passive: true }));
+  ['pointerup', 'pointercancel', 'touchend', 'touchcancel', 'mouseup'].forEach(e => $('luc-drsnik').addEventListener(e, () => { vlecemDrsnik = false; drsnikSpuscen = Date.now(); }, { passive: true }));
   $('luc-drsnik').onchange = () => { const l = luci[odprtaLuc]; poslji([{ dev: l.dev, ch: l.ch, on: true, b: +$('luc-drsnik').value, t: 0 }]); };
   $('b-nazaj-podr').onclick = () => odpriProstor(trenutniProstor);
   // ---------- urejanje luči: meni ----------
