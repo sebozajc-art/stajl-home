@@ -328,9 +328,9 @@
     <div id="panel-premik" class="skrito"><div class="cipi" id="luc-prostori"></div></div>
     <div id="panel-obnasanje" class="skrito">
       <label for="d-prizig" class="drsnik-oznaka"><span data-t="prizigCas"></span><span id="d-prizig-v"></span></label>
-      <input type="range" id="d-prizig" min="0" max="10" step="0.5" value="1">
+      <input type="range" id="d-prizig" min="0" max="10" step="0.5" value="0.5">
       <label for="d-ugas" class="drsnik-oznaka"><span data-t="ugasCas"></span><span id="d-ugas-v"></span></label>
-      <input type="range" id="d-ugas" min="0" max="60" step="0.5" value="1">
+      <input type="range" id="d-ugas" min="0" max="60" step="0.5" value="0.5">
       <label for="d-vklop" class="drsnik-oznaka"><span data-t="svetlostVklop"></span><span id="d-vklop-v"></span></label>
       <input type="range" id="d-vklop" min="1" max="100" value="80">
       <label class="potrditev"><input type="checkbox" id="d-zadnja"><span data-t="zadnjaSvetlost"></span></label>
@@ -1189,7 +1189,7 @@
   let nastavitveLuci = {};
   function nast(dev, ch) {
     const n = nastavitveLuci[kljuc(dev, ch)];
-    return { prizig: n ? +n.prizig : 1, ugas: n ? +n.ugas : 1, vklop: n && n.svetlost_vklop ? +n.svetlost_vklop : null };
+    return { prizig: n ? +n.prizig : 0.5, ugas: n ? +n.ugas : 0.5, vklop: n && n.svetlost_vklop ? +n.svetlost_vklop : null };
   }
   async function osvezi() {
     const { data, error } = await sb.from('devices').select(IZBRANO);
