@@ -1177,7 +1177,7 @@
     ]);
     if (nd.error) throw nd.error;
     if (pr.error) throw pr.error;
-    naprave = {}; (nd.data || []).forEach(d => naprave[d.id] = d);
+    naprave = {}; (nd.data || []).forEach(d => { naprave[d.id] = d; pripraviKanal(d.id); });
     prostori = pr.data || [];
     razpored = (rz.data || []).filter(r => naprave[r.device_id]);
     sceneDoma = sc.data || [];
@@ -1194,7 +1194,7 @@
   async function osvezi() {
     const { data, error } = await sb.from('devices').select(IZBRANO);
     if (error || !data) return;
-    data.forEach(d => naprave[d.id] = d);
+    data.forEach(d => { naprave[d.id] = d; pripraviKanal(d.id); });
     osveziPrikaz();
   }
   function zazeniOsvezevanje() { clearInterval(osvezevanje); osvezevanje = setInterval(osvezi, 2500); }
@@ -1400,20 +1400,22 @@
     ukazi.forEach(u => { if (u.t === undefined) { const n = nast(u.dev, u.ch); u.t = u.on ? n.prizig : n.ugas; } });
     ukazi.forEach(u => { const prej = stanjeLuci(u.dev, u.ch); lokalno[kljuc(u.dev, u.ch)] = { on: u.on, b: u.on && u.b ? u.b : prej.b, do: Date.now() + 4000 }; });
     osveziPrikaz();
+    [...new Set(ukazi.map(u => u.dev))].forEach(zbudiNapravo);   // zbudi že zdaj; krmilnik počaka na vpis ukaza
     const vrstice = ukazi.map(u => Object.assign({ device_id: u.dev, channel: u.ch, turn_on: u.on, brightness: u.on && u.b ? u.b : null }, u.t ? { trajanje: u.t } : {}));
     const { error } = await sb.from('commands').insert(vrstice);
     if (error) { ukazi.forEach(u => delete lokalno[kljuc(u.dev, u.ch)]); osveziPrikaz(); if (trenutniPogled === 'v-naprava') $('status').textContent = t('ukazNi'); return; }
     [...new Set(ukazi.map(u => u.dev))].forEach(zbudiNapravo);
   }
   // Krmilnik s stalno povezavo (shelly-ws) ukaz pobere takoj, ko dobi "zbudi"
-  const kanaliNaprav = {};
+  var kanaliNaprav = {};
+  function pripraviKanal(dev) {
+    if (!dev || (naprave[dev] && naprave[dev].demo)) return null;
+    let k = kanaliNaprav[dev];
+    if (!k) { k = kanaliNaprav[dev] = sb.channel('shelly:' + dev); k.subscribe(); }
+    return k;
+  }
   function zbudiNapravo(dev) {
-    try {
-      if (naprave[dev] && naprave[dev].demo) return;
-      let k = kanaliNaprav[dev];
-      if (!k) { k = kanaliNaprav[dev] = sb.channel('shelly:' + dev); k.subscribe(); }
-      k.send({ type: 'broadcast', event: 'zbudi', payload: {} });
-    } catch (_) {}
+    try { const k = pripraviKanal(dev); if (k) k.send({ type: 'broadcast', event: 'zbudi', payload: {} }); } catch (_) {}
   }
   function klikLuci(k, e) {
     const l = luci[k], s = stanje(k);
