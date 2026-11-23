@@ -1121,9 +1121,15 @@
   function lociKljuc(k) { const i = k.lastIndexOf(':'); return { dev: k.slice(0, i), ch: +k.slice(i + 1) }; }
   function stanjeLuci(dev, ch) {
     const o = lokalno[kljuc(dev, ch)];
-    if (o && Date.now() < o.do) return { on: o.on, b: o.b };
     const d = naprave[dev]; const s = d && d.state && (d.state[ch] || d.state[String(ch)]);
-    return { on: !!(s && s.on), b: (s && s.b) || 100 };
+    const streznik = { on: !!(s && s.on), b: (s && s.b) || 100 };
+    if (o) {
+      // pokaži to, kar je uporabnik nastavil, dokler krmilnik ne potrdi (največ 12 s)
+      const potrjeno = streznik.on === o.on && (!o.on || streznik.b === o.b);
+      if (Date.now() < o.do || (!potrjeno && Date.now() < o.do + 8000)) return { on: o.on, b: o.b };
+      delete lokalno[kljuc(dev, ch)];
+    }
+    return streznik;
   }
   function stanje(k) { const l = luci[k] || lociKljuc(k); return stanjeLuci(l.dev, l.ch); }
   function imeLuci(dev, ch) { const d = naprave[dev]; return d ? imeKanala(d, ch).ime : t('privzeto')[ch]; }
