@@ -1999,6 +1999,19 @@
   };
   ['pointerdown', 'touchstart', 'mousedown'].forEach(e => $('luc-drsnik').addEventListener(e, () => { vlecemDrsnik = true; }, { passive: true }));
   ['pointerup', 'pointercancel', 'touchend', 'touchcancel', 'mouseup'].forEach(e => $('luc-drsnik').addEventListener(e, () => { vlecemDrsnik = false; drsnikSpuscen = Date.now(); }, { passive: true }));
+  // iPhone: brskalnik med vlečenjem ne pošilja sprotnih vrednosti, zato dotik obdelamo sami (svetlost se spreminja sproti)
+  (() => {
+    const dr = $('luc-drsnik');
+    dr.style.touchAction = 'none';
+    const izDotika = (x) => {
+      const r = dr.getBoundingClientRect();
+      const v = Math.min(100, Math.max(1, Math.round(1 + (x - r.left) / r.width * 99)));
+      if (+dr.value !== v) { dr.value = v; dr.oninput(); }
+    };
+    dr.addEventListener('touchstart', e => { vlecemDrsnik = true; izDotika(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
+    dr.addEventListener('touchmove', e => { izDotika(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
+    dr.addEventListener('touchend', e => { vlecemDrsnik = false; drsnikSpuscen = Date.now(); e.preventDefault(); dr.onchange(); }, { passive: false });
+  })();
   $('luc-drsnik').onchange = () => { clearTimeout(drsnikTimer); const l = luci[odprtaLuc]; poslji([{ dev: l.dev, ch: l.ch, on: true, b: +$('luc-drsnik').value, t: 0 }]); };
   $('b-nazaj-podr').onclick = () => odpriProstor(trenutniProstor);
   // ---------- urejanje luči: meni ----------
