@@ -1983,8 +1983,8 @@
   $('luc-drsnik').oninput = () => {
     const v = +$('luc-drsnik').value, l = luci[odprtaLuc]; $('luc-odst').textContent = v + ' %';
     clearTimeout(drsnikTimer);
-    if (Date.now() - drsnikCas > 600) { drsnikCas = Date.now(); poslji([{ dev: l.dev, ch: l.ch, on: true, b: v, t: 0 }]); }
-    else drsnikTimer = setTimeout(() => poslji([{ dev: l.dev, ch: l.ch, on: true, b: v, t: 0 }]), 620);
+    if (Date.now() - drsnikCas > 250) { drsnikCas = Date.now(); poslji([{ dev: l.dev, ch: l.ch, on: true, b: v, t: 0 }]); }
+    else drsnikTimer = setTimeout(() => poslji([{ dev: l.dev, ch: l.ch, on: true, b: v, t: 0 }]), 270);
   };
   ['pointerdown', 'touchstart', 'mousedown'].forEach(e => $('luc-drsnik').addEventListener(e, () => { vlecemDrsnik = true; }, { passive: true }));
   ['pointerup', 'pointercancel', 'touchend', 'touchcancel', 'mouseup'].forEach(e => $('luc-drsnik').addEventListener(e, () => { vlecemDrsnik = false; drsnikSpuscen = Date.now(); }, { passive: true }));
