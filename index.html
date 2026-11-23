@@ -1402,7 +1402,18 @@
     osveziPrikaz();
     const vrstice = ukazi.map(u => Object.assign({ device_id: u.dev, channel: u.ch, turn_on: u.on, brightness: u.on && u.b ? u.b : null }, u.t ? { trajanje: u.t } : {}));
     const { error } = await sb.from('commands').insert(vrstice);
-    if (error) { ukazi.forEach(u => delete lokalno[kljuc(u.dev, u.ch)]); osveziPrikaz(); if (trenutniPogled === 'v-naprava') $('status').textContent = t('ukazNi'); }
+    if (error) { ukazi.forEach(u => delete lokalno[kljuc(u.dev, u.ch)]); osveziPrikaz(); if (trenutniPogled === 'v-naprava') $('status').textContent = t('ukazNi'); return; }
+    [...new Set(ukazi.map(u => u.dev))].forEach(zbudiNapravo);
+  }
+  // Krmilnik s stalno povezavo (shelly-ws) ukaz pobere takoj, ko dobi "zbudi"
+  const kanaliNaprav = {};
+  function zbudiNapravo(dev) {
+    try {
+      if (naprave[dev] && naprave[dev].demo) return;
+      let k = kanaliNaprav[dev];
+      if (!k) { k = kanaliNaprav[dev] = sb.channel('shelly:' + dev); k.subscribe(); }
+      k.send({ type: 'broadcast', event: 'zbudi', payload: {} });
+    } catch (_) {}
   }
   function klikLuci(k, e) {
     const l = luci[k], s = stanje(k);
