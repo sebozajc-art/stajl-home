@@ -1956,6 +1956,8 @@
     $('luc-odst').textContent = s.on ? s.b + ' %' : t('lucUgasnjena');
     $('luc-stikalo').classList.toggle('on', s.on);
     if (!vlecemDrsnik && Date.now() - drsnikSpuscen > 2000 && document.activeElement !== $('luc-drsnik')) $('luc-drsnik').value = s.b || 100;
+    $('luc-drsnik').disabled = !s.on;   // svetlost se nastavlja samo, ko luč sveti
+    $('luc-drsnik').style.opacity = s.on ? '' : '0.35';
     $('luc-pod').textContent = trenutniProstor ? trenutniProstor.ime : '';
   }
   function narisiPremik() {
@@ -1994,6 +1996,7 @@
   };
   $('luc-stikalo').onclick = () => { const l = luci[odprtaLuc], s = stanje(odprtaLuc); poslji([{ dev: l.dev, ch: l.ch, on: !s.on, b: s.on ? null : (nast(l.dev, l.ch).vklop || s.b || 100) }]); };
   $('luc-drsnik').oninput = () => {
+    if (!stanje(odprtaLuc).on) { narisiLuc(); return; }
     const v = +$('luc-drsnik').value, l = luci[odprtaLuc]; $('luc-odst').textContent = v + ' %';
     clearTimeout(drsnikTimer);
     if (Date.now() - drsnikCas > 100) { drsnikCas = Date.now(); poslji([{ dev: l.dev, ch: l.ch, on: true, b: v, t: 0 }]); }
@@ -2010,11 +2013,11 @@
       const v = Math.min(100, Math.max(1, Math.round(1 + (x - r.left) / r.width * 99)));
       if (+dr.value !== v) { dr.value = v; dr.oninput(); }
     };
-    dr.addEventListener('touchstart', e => { vlecemDrsnik = true; izDotika(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
-    dr.addEventListener('touchmove', e => { izDotika(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
-    dr.addEventListener('touchend', e => { vlecemDrsnik = false; drsnikSpuscen = Date.now(); e.preventDefault(); dr.onchange(); }, { passive: false });
+    dr.addEventListener('touchstart', e => { e.preventDefault(); if (dr.disabled) return; vlecemDrsnik = true; izDotika(e.touches[0].clientX); }, { passive: false });
+    dr.addEventListener('touchmove', e => { e.preventDefault(); if (dr.disabled || !vlecemDrsnik) return; izDotika(e.touches[0].clientX); }, { passive: false });
+    dr.addEventListener('touchend', e => { e.preventDefault(); if (!vlecemDrsnik) return; vlecemDrsnik = false; drsnikSpuscen = Date.now(); dr.onchange(); }, { passive: false });
   })();
-  $('luc-drsnik').onchange = () => { clearTimeout(drsnikTimer); const l = luci[odprtaLuc]; poslji([{ dev: l.dev, ch: l.ch, on: true, b: +$('luc-drsnik').value, t: 0 }]); };
+  $('luc-drsnik').onchange = () => { clearTimeout(drsnikTimer); if (!stanje(odprtaLuc).on) return; const l = luci[odprtaLuc]; poslji([{ dev: l.dev, ch: l.ch, on: true, b: +$('luc-drsnik').value, t: 0 }]); };
   $('b-nazaj-podr').onclick = () => odpriProstor(trenutniProstor);
   // ---------- urejanje luči: meni ----------
   $('b-luc-ime').querySelector('.ik').innerHTML = svg('l_predal');
